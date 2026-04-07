@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="ar">
-<<<<<<< HEAD
-<head> 
-  <meta charset="UTF-8">
-  <title>لعبة الامتحان</title>
-=======
 <head>
 <meta charset="UTF-8">
-<title>لعبة الامتحان</title>
+<title>⚡ ورينا شطارتك</title>
 
 <style>
 body {
   margin: 0;
   font-family: Arial;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
+  background: linear-gradient(135deg, #020617, #0f172a);
   color: white;
   display: flex;
   justify-content: center;
@@ -22,23 +17,27 @@ body {
 }
 
 .container {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(15px);
   padding: 25px;
   border-radius: 20px;
-  width: 350px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
-  animation: fadeIn 0.5s ease;
+  width: 360px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.7);
+  text-align: center;
 }
 
 h1 {
-  text-align: center;
-  color: #38bdf8;
+  color: #22d3ee;
+}
+
+#timer {
+  font-size: 18px;
+  margin-bottom: 10px;
 }
 
 .question {
-  margin: 15px 0;
   font-size: 18px;
+  margin: 15px 0;
 }
 
 .option {
@@ -52,7 +51,7 @@ h1 {
 }
 
 .option:hover {
-  background: #38bdf8;
+  background: #22d3ee;
   transform: scale(1.05);
 }
 
@@ -66,97 +65,20 @@ button {
   color: white;
   font-size: 16px;
   cursor: pointer;
-  transition: 0.3s;
 }
 
 button:hover {
   background: #16a34a;
-  transform: scale(1.05);
 }
 
 #result {
   margin-top: 15px;
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-<meta charset="UTF-8">
-<title>لعبة الامتحان</title>
-
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.container {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  padding: 25px;
-  border-radius: 20px;
-  width: 350px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
-  animation: fadeIn 0.5s ease;
-}
-
-h1 {
-  text-align: center;
-  color: #38bdf8;
-}
-
-.question {
-  margin: 15px 0;
   font-size: 18px;
 }
 
-.option {
-  display: block;
-  background: #1e293b;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.option:hover {
-  background: #38bdf8;
-  transform: scale(1.05);
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 15px;
-  border: none;
-  border-radius: 10px;
-  background: #22c55e;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  background: #16a34a;
-  transform: scale(1.05);
-}
-
-#result {
-  margin-top: 15px;
-  text-align: center;
-  font-size: 18px;
-  animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(10px);}
-  to {opacity: 1; transform: translateY(0);}
+.stars {
+  font-size: 22px;
+  color: gold;
 }
 </style>
 </head>
@@ -164,27 +86,48 @@ button:hover {
 <body>
 
 <div class="container">
-  <h1>🎯 لعبة الامتحان</h1>
+  <h1>⚡ ورينا شطارتك</h1>
+
+  <div id="timer">⏱️ الوقت: 10</div>
 
   <div id="quiz"></div>
 
   <button onclick="checkAnswer()">تأكيد الإجابة</button>
 
   <p id="result"></p>
+  <div id="stars"></div>
 </div>
 
 <script>
 const questions = [
   {question: "ما هي عاصمة مصر؟", options: ["القاهرة","الإسكندرية","الفيوم","أسوان"], answer: "القاهرة"},
   {question: "2 + 2 = ؟", options: ["3","4","5","6"], answer: "4"},
-  {question: "من هو مؤسس مايكروسوفت؟", options: ["ستيف جوبز","بيل جيتس","إيلون ماسك","مارك زوكربيرج"], answer: "بيل جيتس"}
+  {question: "من مؤسس مايكروسوفت؟", options: ["ستيف جوبز","بيل جيتس","إيلون ماسك","مارك"], answer: "بيل جيتس"}
 ];
 
 let current = 0;
 let score = 0;
+let timer;
+let timeLeft = 10;
+
+function startTimer() {
+  clearInterval(timer);
+  timeLeft = 10;
+
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = "⏱️ الوقت: " + timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      checkAnswer();
+    }
+  }, 1000);
+}
 
 function showQuestion() {
   let q = questions[current];
+
   let html = `<div class="question">${q.question}</div>`;
 
   q.options.forEach(opt => {
@@ -194,19 +137,18 @@ function showQuestion() {
   });
 
   document.getElementById("quiz").innerHTML = html;
+
+  startTimer();
 }
 
 function checkAnswer() {
+  clearInterval(timer);
+
   let selected = document.querySelector('input[name="opt"]:checked');
 
-  if (!selected) {
-    document.getElementById("result").innerText = "اختار إجابة الأول 😅";
-    return;
-  }
-
-  if (selected.value === questions[current].answer) {
+  if (selected && selected.value === questions[current].answer) {
     score++;
-    document.getElementById("result").innerText = "✅ إجابة صحيحة!";
+    document.getElementById("result").innerText = "✅ صح يا بطل!";
   } else {
     document.getElementById("result").innerText = "❌ غلط! الصح: " + questions[current].answer;
   }
@@ -215,14 +157,29 @@ function checkAnswer() {
 
   if (current < questions.length) {
     setTimeout(() => {
-      showQuestion();
       document.getElementById("result").innerText = "";
-    }, 800);
+      showQuestion();
+    }, 1000);
   } else {
-    document.getElementById("quiz").innerHTML =
-      `<h2>انتهت اللعبة 🎉</h2><h3>نتيجتك: ${score}/${questions.length}</h3>`;
-    document.getElementById("result").innerText = "";
+    showFinal();
   }
+}
+
+function showFinal() {
+  document.getElementById("quiz").innerHTML = "";
+
+  let stars = "⭐".repeat(score);
+
+  let level = "";
+  if (score === questions.length) level = "🔥 أسطورة!";
+  else if (score >= 2) level = "👍 كويس";
+  else level = "😅 محتاج تحسن";
+
+  document.getElementById("timer").innerText = "🏁 انتهت اللعبة";
+  document.getElementById("result").innerText =
+    `نتيجتك: ${score}/${questions.length} - ${level}`;
+
+  document.getElementById("stars").innerText = stars;
 }
 
 showQuestion();
