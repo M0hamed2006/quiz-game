@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌧️ Monster Quiz - Calm Mode</title>
+<title>🌧️ Monster Quiz ULTRA</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 
@@ -13,126 +13,143 @@ body {
     font-family: 'Cairo', sans-serif;
     color: white;
     height: 100vh;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden;
-    background: #000;
+    background: black;
 }
 
-/* السماء */
-body::before {
-    content: '';
+/* 🌅 السماء */
+.sky {
     position: absolute;
     inset: 0;
     background: linear-gradient(270deg,
         #0f2027,
-        #203a43,
         #2c5364,
         #ff7e5f,
         #feb47b,
+        #1a2980,
         #0f2027
     );
-    background-size: 1200% 1200%;
-    animation: skyShift 80s ease infinite;
+    background-size: 2000% 2000%;
+    animation: skyMove 60s ease infinite;
+    z-index: -6;
+}
+
+/* ☁️ سحاب */
+.clouds {
+    position: absolute;
+    inset: 0;
+    background: url('https://i.imgur.com/8IuucQZ.png') repeat;
+    opacity: 0.15;
+    animation: cloudMove 120s linear infinite;
     z-index: -5;
 }
 
-/* الكاميرا الطايرة */
-body::after {
-    content: '';
+/* 🌫️ ضباب */
+.fog1, .fog2 {
     position: absolute;
     inset: 0;
-    background: url('https://picsum.photos/1920/1080?blur=2') center/cover no-repeat;
-    opacity: 0.5;
-    filter: brightness(0.7);
-    animation: flyCamera 120s linear infinite;
-    z-index: -4;
+    background: radial-gradient(circle, rgba(255,255,255,0.07), transparent 70%);
 }
 
-/* الضباب */
-.fog {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
-    animation: fogMove 60s linear infinite;
-    z-index: -3;
-}
+.fog1 { animation: fogMove 60s linear infinite; z-index: -4; }
+.fog2 { animation: fogMove 90s linear infinite reverse; z-index: -3; }
 
-/* المطر */
+/* 🌧️ مطر */
 .rain {
     position: absolute;
     inset: 0;
     background: repeating-linear-gradient(
-        transparent,
-        transparent 3px,
-        rgba(200,240,255,0.15) 4px
+        -20deg,
+        rgba(255,255,255,0.15) 0px,
+        rgba(255,255,255,0.15) 2px,
+        transparent 2px,
+        transparent 6px
     );
-    animation: rainFall 0.7s linear infinite;
+    animation: rain 0.5s linear infinite;
     z-index: -2;
 }
 
-/* الأنيميشن */
-@keyframes skyShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+/* ✨ نجوم */
+.stars {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(white 1px, transparent 1px);
+    background-size: 3px 3px;
+    opacity: 0.2;
+    animation: starsBlink 4s infinite alternate;
+    z-index: -1;
 }
 
-@keyframes flyCamera {
-    0% { background-position: 20% 50%; }
-    50% { background-position: 80% 50%; }
-    100% { background-position: 20% 50%; }
+/* 🎥 حركة */
+@keyframes skyMove {
+    0% {background-position:0% 50%;}
+    50% {background-position:100% 50%;}
+    100% {background-position:0% 50%;}
 }
-
+@keyframes cloudMove {
+    from {background-position:0 0;}
+    to {background-position:1000px 0;}
+}
 @keyframes fogMove {
-    0% { transform: translateX(-10%); }
-    100% { transform: translateX(10%); }
+    from {transform:translateX(-10%);}
+    to {transform:translateX(10%);}
+}
+@keyframes rain {
+    from {background-position:0 0;}
+    to {background-position:-200px 400px;}
+}
+@keyframes starsBlink {
+    from {opacity:0.1;}
+    to {opacity:0.4;}
 }
 
-@keyframes rainFall {
-    from { background-position: 0 0; }
-    to { background-position: 0 150px; }
-}
-
-/* الكارت */
+/* 💎 الكارت */
 .card {
-    background: rgba(15,20,40,0.85);
+    background: rgba(10,15,30,0.8);
     backdrop-filter: blur(25px);
     padding: 20px;
-    border-radius: 20px;
+    border-radius: 25px;
     width: 90%;
-    max-width: 380px;
+    max-width: 400px;
     text-align: center;
-    box-shadow: 0 0 40px rgba(165,243,252,0.2);
+    box-shadow: 0 0 50px rgba(100,200,255,0.3);
 }
 
+/* ✨ عنوان */
 h1 {
     font-weight: 900;
-    background: linear-gradient(90deg,#a5f3fc,#c4b5fd,#f9a8d4);
+    font-size: 1.8rem;
+    background: linear-gradient(90deg,#67e8f9,#a5b4fc,#f472b6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
+/* الخيارات */
 .option {
     background: rgba(30,40,65,0.9);
-    padding: 10px;
+    padding: 12px;
     margin: 6px 0;
-    border-radius: 12px;
+    border-radius: 14px;
     cursor: pointer;
+    transition: 0.3s;
 }
 
 .option:hover {
-    border: 2px solid #67e8f9;
+    transform: scale(1.05);
+    box-shadow: 0 0 10px #67e8f9;
 }
 
+/* زر */
 button {
     width: 100%;
     padding: 12px;
     margin-top: 10px;
+    border-radius: 14px;
     border: none;
-    border-radius: 12px;
-    background: linear-gradient(45deg,#22c55e,#38bdf8);
+    background: linear-gradient(45deg,#22c55e,#38bdf8,#a78bfa);
     color: white;
     font-weight: bold;
     cursor: pointer;
@@ -142,49 +159,53 @@ button {
 
 <body>
 
+<div class="sky"></div>
+<div class="clouds"></div>
+<div class="fog1"></div>
+<div class="fog2"></div>
 <div class="rain"></div>
-<div class="fog"></div>
+<div class="stars"></div>
 
 <div class="card">
     <h1>🌧️ Monster Quiz</h1>
-    <p id="question">اضغط ابدأ</p>
-    <div id="answers"></div>
-    <button onclick="startGame()">ابدأ</button>
+    <p id="q">اضغط ابدأ</p>
+    <div id="ans"></div>
+    <button onclick="start()">ابدأ</button>
 </div>
 
 <script>
-let questions = [
-    {q:"عاصمة مصر؟",o:["القاهرة","الجيزة","أسوان"],a:"القاهرة"},
-    {q:"2+2؟",o:["4","5","3"],a:"4"}
+let data=[
+{q:"عاصمة مصر؟",o:["القاهرة","الجيزة","أسوان"],a:"القاهرة"},
+{q:"5+5؟",o:["10","11","9"],a:"10"}
 ];
 
-let index = 0;
+let i=0;
 
-function startGame(){
-    loadQuestion();
+function start(){
+    load();
 }
 
-function loadQuestion(){
-    if(index>=questions.length){
-        document.getElementById("question").innerText="خلصت 🔥";
-        document.getElementById("answers").innerHTML="";
+function load(){
+    if(i>=data.length){
+        document.getElementById("q").innerText="خلصت 🔥";
+        document.getElementById("ans").innerHTML="";
         return;
     }
 
-    let q=questions[index];
-    document.getElementById("question").innerText=q.q;
+    let d=data[i];
+    document.getElementById("q").innerText=d.q;
 
     let html="";
-    q.o.forEach(op=>{
-        html+=`<div class="option" onclick="next()">${op}</div>`;
+    d.o.forEach(o=>{
+        html+=`<div class="option" onclick="next()">${o}</div>`;
     });
 
-    document.getElementById("answers").innerHTML=html;
+    document.getElementById("ans").innerHTML=html;
 }
 
 function next(){
-    index++;
-    loadQuestion();
+    i++;
+    load();
 }
 </script>
 
