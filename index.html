@@ -2,13 +2,13 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>⚡ ورينا شطارتك</title>
+<title>🔥 Monster Quiz</title>
 
 <style>
 body {
   margin: 0;
   font-family: Arial;
-  background: radial-gradient(circle at top, #020617, #000);
+  background: radial-gradient(circle at top, #0f172a, #020617);
   color: white;
   display: flex;
   justify-content: center;
@@ -17,44 +17,30 @@ body {
   overflow: hidden;
 }
 
-.container {
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
+.card {
+  width: 380px;
   padding: 25px;
   border-radius: 20px;
-  width: 370px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px);
   box-shadow: 0 0 40px rgba(0,0,0,0.8);
   text-align: center;
-  animation: float 3s infinite ease-in-out;
+  transform-style: preserve-3d;
+  animation: pop 0.6s ease;
 }
 
-@keyframes float {
-  0%,100% {transform: translateY(0);}
-  50% {transform: translateY(-10px);}
+@keyframes pop {
+  from {transform: scale(0.7) rotateX(20deg); opacity: 0;}
+  to {transform: scale(1) rotateX(0); opacity: 1;}
 }
 
-input {
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  width: 90%;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(45deg, #22c55e, #06b6d4);
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
+h1 {
+  text-shadow: 0 0 10px #fff;
 }
 
 .option {
-  display: block;
   background: #1e293b;
-  padding: 10px;
+  padding: 12px;
   margin: 8px 0;
   border-radius: 10px;
   cursor: pointer;
@@ -63,191 +49,183 @@ button {
 
 .option:hover {
   transform: scale(1.05);
+  background: #22d3ee;
 }
 
 .correct {
   background: #22c55e !important;
-  animation: pulse 0.5s;
+  transform: scale(1.1);
 }
 
 .wrong {
   background: #ef4444 !important;
-  animation: shake 0.5s;
-}
-
-@keyframes pulse {
-  0% {transform: scale(1);}
-  50% {transform: scale(1.1);}
-  100% {transform: scale(1);}
+  animation: shake 0.3s;
 }
 
 @keyframes shake {
-  0%,100% {transform: translateX(0);}
-  25% {transform: translateX(-5px);}
-  50% {transform: translateX(5px);}
+  0%{transform: translateX(0);}
+  25%{transform: translateX(-5px);}
+  50%{transform: translateX(5px);}
+  75%{transform: translateX(-5px);}
+  100%{transform: translateX(0);}
 }
 
-#timerBar {
+#bar {
   height: 8px;
   background: #22c55e;
-  margin-bottom: 10px;
+  margin: 10px 0;
   transition: 1s linear;
 }
 
-.star {
-  position: fixed;
-  top: -20px;
-  font-size: 20px;
-  animation: fall 3s linear;
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(45deg,#22c55e,#06b6d4,#a855f7);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.explode {
+  animation: boom 1s;
+}
+
+@keyframes boom {
+  0% {transform: scale(1);}
+  50% {transform: scale(1.3) rotate(5deg);}
+  100% {transform: scale(1);}
+}
+
+.confetti {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: red;
+  animation: fall 2s linear infinite;
 }
 
 @keyframes fall {
-  to {
-    transform: translateY(100vh);
-    opacity: 0;
-  }
+  from {transform: translateY(-100px) rotate(0);}
+  to {transform: translateY(800px) rotate(360deg);}
 }
-
 </style>
+
 </head>
 
 <body>
 
-<div class="container">
+<div class="card" id="game">
 
-<div id="start">
-  <h2>🎮 اكتب اسمك</h2>
-  <input id="playerName">
-  <button onclick="startGame()">ابدأ</button>
-</div>
+<h2>🔥 Monster Quiz</h2>
+<div id="timer">20</div>
+<div id="bar"></div>
 
-<div id="game" style="display:none;">
-  <div id="timer">⏱️ 20</div>
-  <div id="timerBar"></div>
+<div id="question"></div>
 
-  <div id="quiz"></div>
-  <button onclick="checkAnswer()">تأكيد</button>
+<button onclick="next()">تأكيد</button>
 
-  <p id="result"></p>
-  <div id="leaderboard"></div>
-</div>
+<p id="result"></p>
 
 </div>
 
 <script>
 
-let correctSound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
-let wrongSound = new Audio("https://www.soundjay.com/buttons/sounds/button-10.mp3");
-let winSound = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3");
-
-const questions = [
-  {question:"عاصمة مصر؟", options:["القاهرة","الفيوم","أسوان"], answer:"القاهرة"},
-  {question:"2+2؟", options:["3","4","5"], answer:"4"},
-  {question:"مؤسس مايكروسوفت؟", options:["بيل جيتس","ستيف جوبز"], answer:"بيل جيتس"}
+let questions = [
+  {q:"عاصمة مصر؟", o:["القاهرة","الجيزة","أسوان"], a:"القاهرة"},
+  {q:"2 + 2 = ?", o:["4","5","3"], a:"4"},
+  {q:"مين مؤسس Facebook؟", o:["مارك","بيل","ستيف"], a:"مارك"}
 ];
 
-let current=0, score=0, timer, timeLeft=20;
-let scores = JSON.parse(localStorage.getItem("scores")) || [];
+let i=0;
+let score=0;
+let time=20;
+let timer;
 
-function startGame(){
-  playerName=document.getElementById("playerName").value;
-  document.getElementById("start").style.display="none";
-  document.getElementById("game").style.display="block";
-  showQuestion();
+let correct = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
+let wrong = new Audio("https://www.soundjay.com/buttons/sounds/button-10.mp3");
+
+function loadQ(){
+  let q = questions[i];
+
+  document.getElementById("question").innerHTML = `
+    <h3>${q.q}</h3>
+    ${q.o.map(o=>`
+      <div class="option">
+        <input type="radio" name="opt" value="${o}"> ${o}
+      </div>
+    `).join("")}
+  `;
+
+  startTimer();
 }
 
 function startTimer(){
   clearInterval(timer);
-  timeLeft=20;
+  time = 20;
 
-  timer=setInterval(()=>{
-    timeLeft--;
-    document.getElementById("timer").innerText="⏱️ "+timeLeft;
+  timer = setInterval(()=>{
+    time--;
+    document.getElementById("timer").innerText = time;
+    document.getElementById("bar").style.width = (time*5)+"%";
 
-    document.getElementById("timerBar").style.width=(timeLeft*5)+"%";
-
-    if(timeLeft<=0){
-      checkAnswer();
-    }
+    if(time<=0) next();
   },1000);
 }
 
-function showQuestion(){
-  let q=questions[current];
-  let html=`<div>${q.question}</div>`;
+function next(){
 
-  q.options.forEach(o=>{
-    html+=`<label class="option">
-      <input type="radio" name="opt" value="${o}"> ${o}
-    </label>`;
-  });
+  let selected = document.querySelector('input[name="opt"]:checked');
 
-  document.getElementById("quiz").innerHTML=html;
-  startTimer();
-}
+  let options = document.querySelectorAll(".option");
 
-function checkAnswer(){
-  clearInterval(timer);
-
-  let selected=document.querySelector('input[name="opt"]:checked');
-
-  let options=document.querySelectorAll(".option");
-
-  if(selected && selected.value===questions[current].answer){
+  if(selected && selected.value === questions[i].a){
     score++;
-    correctSound.play();
+    correct.play();
     options.forEach(o=>o.classList.add("correct"));
-    launchStars();
-  }else{
-    wrongSound.play();
+    document.getElementById("game").classList.add("explode");
+    showConfetti();
+  } else {
+    wrong.play();
     options.forEach(o=>o.classList.add("wrong"));
   }
 
-  current++;
-
   setTimeout(()=>{
-    if(current<questions.length){
-      showQuestion();
-    }else{
-      showFinal();
+    document.getElementById("game").classList.remove("explode");
+
+    i++;
+
+    if(i < questions.length){
+      loadQ();
+    } else {
+      end();
     }
-  },1200);
+
+  },800);
 }
 
-function launchStars(){
-  for(let i=0;i<25;i++){
-    let star=document.createElement("div");
-    star.innerText="⭐";
-    star.className="star";
-    star.style.left=Math.random()*window.innerWidth+"px";
-    document.body.appendChild(star);
+function end(){
+  document.getElementById("game").innerHTML = `
+    <h2>🏁 خلصت اللعبة</h2>
+    <h3>نتيجتك: ${score}/${questions.length}</h3>
+  `;
+}
 
-    setTimeout(()=>star.remove(),3000);
+function showConfetti(){
+  for(let i=0;i<30;i++){
+    let c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random()*100+"vw";
+    c.style.background = ["red","yellow","blue","green"][Math.floor(Math.random()*4)];
+    document.body.appendChild(c);
+
+    setTimeout(()=>c.remove(),2000);
   }
 }
 
-function showFinal(){
-  winSound.play();
-
-  scores.push({name:playerName, score:score});
-  localStorage.setItem("scores", JSON.stringify(scores));
-
-  document.getElementById("result").innerText=
-    "🎯 نتيجتك: "+score;
-
-  showLeaderboard();
-}
-
-function showLeaderboard(){
-  scores.sort((a,b)=>b.score-a.score);
-
-  let html="<h3>🏆 الترتيب</h3>";
-  scores.forEach((s,i)=>{
-    html+=`<p>${i+1}. ${s.name} - ${s.score}</p>`;
-  });
-
-  document.getElementById("leaderboard").innerHTML=html;
-}
+loadQ();
 
 </script>
 
