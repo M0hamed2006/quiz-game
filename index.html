@@ -20,21 +20,12 @@
             background: #0a0f1c;
         }
 
-        /* خلفية أسطورية جديدة (شروق/غروب + ضباب + مطر) */
         body::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(
-                to bottom,
-                rgba(15, 23, 42, 0.75),
-                rgba(45, 20, 65, 0.85),
-                rgba(95, 35, 85, 0.75),
-                rgba(130, 55, 45, 0.55),
-                rgba(180, 85, 40, 0.45)
-            );
+            background: linear-gradient(to bottom, rgba(15,23,42,0.75), rgba(45,20,65,0.85), rgba(95,35,85,0.75), rgba(130,55,45,0.55));
             z-index: -2;
-            animation: twilightGlow 25s ease infinite alternate;
         }
         body::after {
             content: '';
@@ -43,8 +34,7 @@
             background: url('https://picsum.photos/id/1015/1920/1080') center/cover;
             opacity: 0.75;
             z-index: -3;
-            filter: blur(2px) brightness(0.85) contrast(1.1);
-            animation: mistMove 90s linear infinite;
+            filter: blur(2px) brightness(0.85);
         }
 
         .rain {
@@ -53,120 +43,99 @@
             background: linear-gradient(transparent, rgba(165, 243, 252, 0.12));
             background-size: 100% 220%;
             animation: fallingRain 0.75s linear infinite;
-            pointer-events: none;
             z-index: -1;
             opacity: 0.75;
         }
-
         @keyframes fallingRain { 0% { background-position: 0 0; } 100% { background-position: 0 220%; } }
-        @keyframes twilightGlow { from { opacity: 0.92; } to { opacity: 1.1; } }
-        @keyframes mistMove { 0% { background-position: 0% 50%; } 100% { background-position: 140% 50%; } }
 
         .card {
-            width: 94%;
-            max-width: 440px;
-            padding: 24px 16px;
-            border-radius: 26px;
-            background: rgba(12, 18, 35, 0.88);
+            width: 96%;
+            max-width: 420px;
+            padding: 18px 12px;
+            border-radius: 22px;
+            background: rgba(12, 18, 35, 0.92);
             backdrop-filter: blur(32px);
-            box-shadow: 0 0 90px rgba(165, 243, 252, 0.4);
+            box-shadow: 0 0 80px rgba(165, 243, 252, 0.35);
             text-align: center;
             z-index: 10;
         }
 
         h1 { 
-            font-size: 2.15rem; 
+            font-size: 1.95rem; 
             font-weight: 900; 
-            background: linear-gradient(90deg, #67e8f9, #c4b5fd, #f472b6, #fb923c, #6ee7b7); 
+            background: linear-gradient(90deg, #67e8f9, #c4b5fd, #f472b6, #fb923c); 
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
-            margin: 8px 0 12px;
+            margin: 6px 0 10px;
         }
         .monster-icon { 
-            font-size: 4.6rem; 
-            margin: 8px 0 12px; 
+            font-size: 3.8rem; 
+            margin: 6px 0 10px; 
             animation: gentleFloat 6s ease-in-out infinite; 
-            filter: drop-shadow(0 0 35px #a5f3fc);
         }
-        @keyframes gentleFloat { 
-            0%,100% { transform: translateY(0) rotate(-4deg); } 
-            50% { transform: translateY(-18px) rotate(4deg); } 
-        }
+        @keyframes gentleFloat { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-14px) rotate(3deg); } }
 
         #timer { 
-            font-size: 2.75rem; 
+            font-size: 2.4rem; 
             font-weight: 900; 
-            margin: 10px 0; 
-            text-shadow: 0 0 25px #67e8f9; 
+            margin: 8px 0; 
         }
 
         #question {
-            max-height: 55vh;
+            max-height: 58vh;
             overflow-y: auto;
-            padding-right: 8px;
+            padding-right: 6px;
         }
 
         .option {
-            background: rgba(30, 41, 59, 0.92);
-            padding: 13px 15px;
-            margin: 7px 0;
-            border-radius: 15px;
+            background: rgba(30, 41, 59, 0.95);
+            padding: 11px 14px;
+            margin: 5px 0;
+            border-radius: 14px;
             cursor: pointer;
-            transition: all 0.35s ease;
-            font-size: 1.02rem;
+            font-size: 0.97rem;
             border: 3px solid transparent;
-            min-height: 46px;
+            min-height: 42px;
             display: flex;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
         }
 
         .option:hover, .option:active {
-            transform: translateY(-4px);
+            transform: translateY(-3px);
             border-color: #67e8f9;
-            box-shadow: 0 0 28px rgba(165, 243, 252, 0.5);
         }
 
-        .correct { background: #22c55e !important; transform: scale(1.04); }
-        .wrong { background: #ef4444 !important; animation: shake 0.5s; }
-
-        @keyframes shake { 
-            0%,100%{transform:translateX(0)} 
-            25%{transform:translateX(-6px)} 
-            75%{transform:translateX(6px)} 
-        }
+        .correct { background: #22c55e !important; }
+        .wrong { background: #ef4444 !important; animation: shake 0.4s; }
 
         button {
             width: 100%; 
-            padding: 16px; 
-            margin-top: 18px;
-            font-size: 1.22rem; 
+            padding: 14px; 
+            margin-top: 16px;
+            font-size: 1.15rem; 
             font-weight: 800; 
             border: none; 
-            border-radius: 20px;
-            background: linear-gradient(45deg, #22c55e, #06b6d4, #a78bfa, #f472b6);
+            border-radius: 18px;
+            background: linear-gradient(45deg, #22c55e, #06b6d4, #a78bfa);
             color: white; 
-            cursor: pointer; 
-            box-shadow: 0 12px 40px rgba(165, 243, 252, 0.45);
+            cursor: pointer;
         }
 
-        /* تعديلات موبايل قوية جداً */
+        /* تعديلات الموبايل الأقوى */
         @media (max-width: 480px) {
             .card {
-                padding: 20px 14px;
-                width: 96%;
-                border-radius: 22px;
+                padding: 16px 10px;
+                width: 97%;
             }
-            h1 { font-size: 1.82rem; }
-            .monster-icon { font-size: 3.85rem; }
-            #timer { font-size: 2.4rem; }
+            h1 { font-size: 1.75rem; }
+            .monster-icon { font-size: 3.4rem; }
+            #timer { font-size: 2.25rem; }
             .option {
-                font-size: 0.98rem;
-                padding: 12px 14px;
-                min-height: 44px;
-                margin: 6px 0;
+                font-size: 0.95rem;
+                padding: 10px 12px;
+                min-height: 40px;
+                margin: 4px 0;
             }
-            #question { max-height: 56vh; }
         }
     </style>
 </head>
@@ -177,11 +146,11 @@
 <div class="card" id="passwordScreen">
     <span class="monster-icon">🌧️🌙</span>
     <h1>Monster Quiz</h1>
-    <p style="margin:18px 0 15px; font-size:1.1rem;">ادخل كلمة السر عشان ندخل </p>
-    <input type="password" id="passwordInput" placeholder="كلمة السر"
-           style="width:100%; padding:15px; border-radius:16px; border:none; background:rgba(30,41,59,0.9); color:white; text-align:center; font-size:1.1rem;">
+    <p style="margin:15px 0 12px; font-size:1.05rem;">ادخل كلمة السر</p>
+    <input type="password" id="passwordInput" placeholder="258147"
+           style="width:100%; padding:14px; border-radius:14px; border:none; background:rgba(30,41,59,0.9); color:white; text-align:center; font-size:1.05rem;">
     <button onclick="checkPassword()">دخول 🌧️</button>
-    <p id="passwordError" style="color:#f87171; margin-top:12px;"></p>
+    <p id="passwordError" style="color:#f87171; margin-top:10px;"></p>
 </div>
 
 <!-- شاشة اللعبة -->
@@ -190,8 +159,8 @@
     <h1>Monster Quiz</h1>
    
     <div id="timer">20</div>
-    <div id="bar-container" style="height:11px; background:rgba(255,255,255,0.15); border-radius:9999px; overflow:hidden; margin:12px 0;">
-        <div id="bar" style="height:100%; background:linear-gradient(90deg,#22c55e,#a5f3fc,#f472b6); width:100%;"></div>
+    <div id="bar-container" style="height:10px; background:rgba(255,255,255,0.2); border-radius:9999px; overflow:hidden; margin:10px 0;">
+        <div id="bar" style="height:100%; background:linear-gradient(90deg,#22c55e,#a5f3fc); width:100%;"></div>
     </div>
    
     <div id="question"></div>
@@ -201,7 +170,6 @@
 </div>
 
 <script>
-// الباسورد
 const CORRECT_PASSWORD = "258147";
 
 function checkPassword() {
@@ -213,11 +181,10 @@ function checkPassword() {
     } else {
         document.getElementById("passwordError").textContent = "❌ كلمة السر غلط!";
         document.getElementById("passwordInput").value = "";
-        setTimeout(() => document.getElementById("passwordError").textContent = "", 2500);
+        setTimeout(() => document.getElementById("passwordError").textContent = "", 2000);
     }
 }
 
-// اللعبة (نفسها بدون تغيير)
 let questions = [
     { q: "عاصمة مصر؟", o: ["القاهرة", "الجيزة", "أسوان", "الإسكندرية"], a: "القاهرة" },
     { q: "2 + 2 = ؟", o: ["4", "5", "3", "6"], a: "4" },
@@ -236,17 +203,13 @@ const questionEl = document.getElementById("question");
 const timerEl = document.getElementById("timer");
 const barEl = document.getElementById("bar");
 const confirmBtn = document.getElementById("confirmBtn");
-const resultEl = document.getElementById("result");
-
-const correctSound = new Audio("https://assets.mixkit.co/sfx/preview/2965/2965.wav");
-const wrongSound = new Audio("https://assets.mixkit.co/sfx/preview/2573/2573.wav");
 
 function loadQuestion() {
     if (currentQuestion >= questions.length) return endGame();
     const q = questions[currentQuestion];
     selectedAnswer = null;
     
-    let html = `<h2 style="margin-bottom:20px; font-size:1.22rem; line-height:1.4;">${q.q}</h2>`;
+    let html = `<h2 style="margin-bottom:16px; font-size:1.1rem; line-height:1.35;">${q.q}</h2>`;
    
     q.o.forEach(opt => {
         html += `<div class="option" onclick="selectOption(this)">${opt}</div>`;
@@ -267,21 +230,16 @@ function startTimer() {
     timeLeft = 20;
     timerEl.textContent = timeLeft;
     barEl.style.width = "100%";
-    
     timerInterval = setInterval(() => {
         timeLeft--;
         timerEl.textContent = timeLeft;
         barEl.style.width = (timeLeft * 5) + "%";
-        if (timeLeft <= 5) timerEl.style.color = "#f87171";
         if (timeLeft <= 0) nextQuestion();
     }, 1000);
 }
 
 confirmBtn.addEventListener("click", () => {
-    if (!selectedAnswer) {
-        resultEl.innerHTML = `<span style="color:#fcd34d;">❗ اختر إجابة أولاً</span>`;
-        return;
-    }
+    if (!selectedAnswer) return;
     nextQuestion();
 });
 
@@ -297,33 +255,26 @@ function nextQuestion() {
 
     if (isCorrect) {
         score++;
-        correctSound.play();
-        confetti({ particleCount: 180, spread: 80, origin: { y: 0.6 } });
-    } else {
-        wrongSound.play();
+        confetti({ particleCount: 150, spread: 70 });
     }
 
     setTimeout(() => {
         currentQuestion++;
         loadQuestion();
-    }, 1300);
+    }, 1200);
 }
 
 function endGame() {
-    clearInterval(timerInterval);
     const percent = Math.round((score / questions.length) * 100);
+    let msg = percent >= 80 ? "🌧️ أداء أسطوري!" : percent >= 60 ? "👍 كويس" : "💧 حاول تاني";
     
-    let msg = percent === 100 ? "🌧️✨ أنت أسطورة المطر!" :
-              percent >= 80 ? "🌙🔥 أداء رائع يا بطل" :
-              percent >= 60 ? "👍 كويس جداً" : "💧 حاول تاني.. المطر بيغسل الأخطاء";
-
     document.getElementById("gameScreen").innerHTML = `
         <span class="monster-icon">🌧️🌕</span>
         <h1>انتهت اللعبة</h1>
-        <h2 style="font-size:2.7rem; margin:20px 0;">${score}/${questions.length}</h2>
-        <p style="font-size:1.75rem;">${percent}%</p>
-        <p style="margin:25px 0;">${msg}</p>
-        <button onclick="location.reload()">🔄 العب مرة أخرى</button>
+        <h2 style="font-size:2.5rem;">${score}/${questions.length}</h2>
+        <p style="font-size:1.6rem;">${percent}%</p>
+        <p>${msg}</p>
+        <button onclick="location.reload()">العب مرة أخرى</button>
     `;
 }
 </script>
