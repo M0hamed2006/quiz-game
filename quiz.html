@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>لعبة الامتحان</title>
+</head>
+<body>
+  <h1>لعبة الامتحان</h1>
+  <div id="quiz"></div>
+  <button onclick="checkAnswer()">تأكيد الإجابة</button>
+  <p id="result"></p>
+
+  <script>
+    const questions = [
+      {question: "ما هي عاصمة مصر؟", options: ["القاهرة","الإسكندرية","الفيوم","أسوان"], answer: "القاهرة"},
+      {question: "2 + 2 = ؟", options: ["3","4","5","6"], answer: "4"},
+      {question: "من هو مؤسس مايكروسوفت؟", options: ["ستيف جوبز","بيل جيتس","إيلون ماسك","مارك زوكربيرج"], answer: "بيل جيتس"}
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    function showQuestion() {
+      let q = questions[current];
+      let html = `<h3>${q.question}</h3>`;
+      q.options.forEach((opt,i)=>{
+        html += `<input type="radio" name="opt" value="${opt}"> ${opt}<br>`;
+      });
+      document.getElementById("quiz").innerHTML = html;
+    }
+
+    function checkAnswer() {
+      let selected = document.querySelector('input[name="opt"]:checked');
+      if (!selected) return;
+      if (selected.value === questions[current].answer) {
+        document.getElementById("result").innerText = "✅ إجابة صحيحة!";
+        score++;
+      } else {
+        document.getElementById("result").innerText = "❌ غلط! الصح هو: " + questions[current].answer;
+      }
+      current++;
+      if (current < questions.length) {
+        showQuestion();
+      } else {
+        document.getElementById("quiz").innerHTML = `<h2>انتهت اللعبة! نتيجتك: ${score}/${questions.length}</h2>`;
+      }
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
+
