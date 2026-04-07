@@ -20,120 +20,141 @@
             background: #0a0f1c;
         }
 
+        /* خلفية أسطورية هادية ومتحركة */
         body::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(15,23,42,0.75), rgba(45,20,65,0.85), rgba(95,35,85,0.75), rgba(130,55,45,0.55));
-            z-index: -2;
+            background: linear-gradient(to bottom, 
+                #1a0f2e 0%, 
+                #2a1b4a 30%, 
+                #4a2c5c 50%, 
+                #6b3a4a 70%, 
+                #9c5f3d 85%, 
+                #1a0f2e 100%);
+            z-index: -3;
+            animation: twilightShift 40s ease infinite alternate;
         }
         body::after {
             content: '';
             position: absolute;
             inset: 0;
             background: url('https://picsum.photos/id/1015/1920/1080') center/cover;
-            opacity: 0.75;
-            z-index: -3;
-            filter: blur(2px) brightness(0.85);
+            opacity: 0.65;
+            z-index: -4;
+            filter: blur(3px) brightness(0.75) saturate(1.3);
+            animation: mistDrift 120s linear infinite;
         }
 
         .rain {
             position: absolute;
             inset: 0;
-            background: linear-gradient(transparent, rgba(165, 243, 252, 0.12));
-            background-size: 100% 220%;
-            animation: fallingRain 0.75s linear infinite;
-            z-index: -1;
-            opacity: 0.75;
+            background: repeating-linear-gradient(
+                transparent 0px,
+                transparent 4px,
+                rgba(165, 243, 252, 0.15) 5px,
+                rgba(165, 243, 252, 0.15) 8px
+            );
+            background-size: 100% 180px;
+            animation: fallingRain 0.9s linear infinite;
+            z-index: -2;
+            opacity: 0.8;
         }
-        @keyframes fallingRain { 0% { background-position: 0 0; } 100% { background-position: 0 220%; } }
+
+        @keyframes fallingRain { 0% { background-position: 0 0; } 100% { background-position: 0 180px; } }
+        @keyframes twilightShift { from { opacity: 0.95; } to { opacity: 1.08; } }
+        @keyframes mistDrift { 0% { background-position: 20% 50%; } 100% { background-position: 80% 50%; } }
 
         .card {
             width: 96%;
-            max-width: 420px;
-            padding: 18px 12px;
-            border-radius: 22px;
-            background: rgba(12, 18, 35, 0.92);
-            backdrop-filter: blur(32px);
-            box-shadow: 0 0 80px rgba(165, 243, 252, 0.35);
+            max-width: 400px;
+            padding: 16px 12px;
+            border-radius: 24px;
+            background: rgba(15, 20, 40, 0.85);
+            backdrop-filter: blur(30px);
+            box-shadow: 0 0 70px rgba(165, 243, 252, 0.25);
             text-align: center;
             z-index: 10;
         }
 
         h1 { 
-            font-size: 1.95rem; 
+            font-size: 1.85rem; 
             font-weight: 900; 
-            background: linear-gradient(90deg, #67e8f9, #c4b5fd, #f472b6, #fb923c); 
+            background: linear-gradient(90deg, #a5f3fc, #c4b5fd, #f9a8d4, #fed7aa); 
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
-            margin: 6px 0 10px;
+            margin: 8px 0 10px;
         }
         .monster-icon { 
-            font-size: 3.8rem; 
-            margin: 6px 0 10px; 
-            animation: gentleFloat 6s ease-in-out infinite; 
+            font-size: 3.7rem; 
+            margin: 6px 0 8px; 
+            animation: gentleFloat 8s ease-in-out infinite; 
         }
-        @keyframes gentleFloat { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-14px) rotate(3deg); } }
+        @keyframes gentleFloat { 
+            0%, 100% { transform: translateY(0) rotate(-3deg); } 
+            50% { transform: translateY(-12px) rotate(3deg); } 
+        }
 
         #timer { 
-            font-size: 2.4rem; 
+            font-size: 2.35rem; 
             font-weight: 900; 
             margin: 8px 0; 
+            color: #a5f3fc;
         }
 
         #question {
             max-height: 58vh;
             overflow-y: auto;
-            padding-right: 6px;
+            padding-right: 5px;
         }
 
         .option {
-            background: rgba(30, 41, 59, 0.95);
-            padding: 11px 14px;
+            background: rgba(30, 40, 65, 0.9);
+            padding: 10px 12px;
             margin: 5px 0;
             border-radius: 14px;
             cursor: pointer;
-            font-size: 0.97rem;
-            border: 3px solid transparent;
+            font-size: 0.96rem;
+            line-height: 1.3;
+            border: 2.5px solid transparent;
             min-height: 42px;
             display: flex;
             align-items: center;
         }
 
         .option:hover, .option:active {
-            transform: translateY(-3px);
             border-color: #67e8f9;
+            transform: translateY(-2px);
         }
 
         .correct { background: #22c55e !important; }
-        .wrong { background: #ef4444 !important; animation: shake 0.4s; }
+        .wrong { background: #ef4444 !important; }
 
         button {
             width: 100%; 
             padding: 14px; 
-            margin-top: 16px;
-            font-size: 1.15rem; 
-            font-weight: 800; 
+            margin-top: 15px;
+            font-size: 1.12rem; 
+            font-weight: 700; 
             border: none; 
             border-radius: 18px;
-            background: linear-gradient(45deg, #22c55e, #06b6d4, #a78bfa);
+            background: linear-gradient(45deg, #22c55e, #38bdf8, #a78bfa);
             color: white; 
             cursor: pointer;
         }
 
-        /* تعديلات الموبايل الأقوى */
         @media (max-width: 480px) {
             .card {
-                padding: 16px 10px;
+                padding: 14px 10px;
                 width: 97%;
             }
-            h1 { font-size: 1.75rem; }
-            .monster-icon { font-size: 3.4rem; }
-            #timer { font-size: 2.25rem; }
+            h1 { font-size: 1.68rem; }
+            .monster-icon { font-size: 3.3rem; }
+            #timer { font-size: 2.15rem; }
             .option {
-                font-size: 0.95rem;
-                padding: 10px 12px;
-                min-height: 40px;
+                font-size: 0.94rem;
+                padding: 9px 11px;
+                min-height: 39px;
                 margin: 4px 0;
             }
         }
@@ -146,11 +167,11 @@
 <div class="card" id="passwordScreen">
     <span class="monster-icon">🌧️🌙</span>
     <h1>Monster Quiz</h1>
-    <p style="margin:15px 0 12px; font-size:1.05rem;">ادخل كلمة السر</p>
+    <p style="margin:14px 0 12px; font-size:1.02rem; opacity:0.9;">ادخل كلمة السر</p>
     <input type="password" id="passwordInput" placeholder="258147"
-           style="width:100%; padding:14px; border-radius:14px; border:none; background:rgba(30,41,59,0.9); color:white; text-align:center; font-size:1.05rem;">
+           style="width:100%; padding:13px; border-radius:14px; border:none; background:rgba(30,40,65,0.9); color:white; text-align:center; font-size:1.05rem;">
     <button onclick="checkPassword()">دخول 🌧️</button>
-    <p id="passwordError" style="color:#f87171; margin-top:10px;"></p>
+    <p id="passwordError" style="color:#f87171; margin-top:10px; font-size:0.95rem;"></p>
 </div>
 
 <!-- شاشة اللعبة -->
@@ -159,8 +180,8 @@
     <h1>Monster Quiz</h1>
    
     <div id="timer">20</div>
-    <div id="bar-container" style="height:10px; background:rgba(255,255,255,0.2); border-radius:9999px; overflow:hidden; margin:10px 0;">
-        <div id="bar" style="height:100%; background:linear-gradient(90deg,#22c55e,#a5f3fc); width:100%;"></div>
+    <div id="bar-container" style="height:9px; background:rgba(255,255,255,0.18); border-radius:9999px; overflow:hidden; margin:10px 0;">
+        <div id="bar" style="height:100%; background:linear-gradient(90deg,#67e8f9,#a5f3fc,#c4b5fd); width:100%;"></div>
     </div>
    
     <div id="question"></div>
@@ -181,7 +202,7 @@ function checkPassword() {
     } else {
         document.getElementById("passwordError").textContent = "❌ كلمة السر غلط!";
         document.getElementById("passwordInput").value = "";
-        setTimeout(() => document.getElementById("passwordError").textContent = "", 2000);
+        setTimeout(() => document.getElementById("passwordError").textContent = "", 2200);
     }
 }
 
@@ -209,7 +230,7 @@ function loadQuestion() {
     const q = questions[currentQuestion];
     selectedAnswer = null;
     
-    let html = `<h2 style="margin-bottom:16px; font-size:1.1rem; line-height:1.35;">${q.q}</h2>`;
+    let html = `<h2 style="margin-bottom:14px; font-size:1.08rem; line-height:1.35;">${q.q}</h2>`;
    
     q.o.forEach(opt => {
         html += `<div class="option" onclick="selectOption(this)">${opt}</div>`;
@@ -230,6 +251,7 @@ function startTimer() {
     timeLeft = 20;
     timerEl.textContent = timeLeft;
     barEl.style.width = "100%";
+    
     timerInterval = setInterval(() => {
         timeLeft--;
         timerEl.textContent = timeLeft;
@@ -255,23 +277,23 @@ function nextQuestion() {
 
     if (isCorrect) {
         score++;
-        confetti({ particleCount: 150, spread: 70 });
+        confetti({ particleCount: 120, spread: 60, origin: { y: 0.7 } });
     }
 
     setTimeout(() => {
         currentQuestion++;
         loadQuestion();
-    }, 1200);
+    }, 1250);
 }
 
 function endGame() {
     const percent = Math.round((score / questions.length) * 100);
-    let msg = percent >= 80 ? "🌧️ أداء أسطوري!" : percent >= 60 ? "👍 كويس" : "💧 حاول تاني";
+    let msg = percent === 100 ? "🌧️✨ أنت أسطورة!" : percent >= 70 ? "🌙 أداء رائع" : "💧 حاول تاني";
     
     document.getElementById("gameScreen").innerHTML = `
         <span class="monster-icon">🌧️🌕</span>
         <h1>انتهت اللعبة</h1>
-        <h2 style="font-size:2.5rem;">${score}/${questions.length}</h2>
+        <h2 style="font-size:2.4rem; margin:15px 0;">${score}/${questions.length}</h2>
         <p style="font-size:1.6rem;">${percent}%</p>
         <p>${msg}</p>
         <button onclick="location.reload()">العب مرة أخرى</button>
