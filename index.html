@@ -71,6 +71,7 @@ button {
 
 <script>
 
+// 🔐 باسورد
 const PASSWORD = "الدفعة الفقرية";
 
 function checkPass(){
@@ -83,9 +84,14 @@ function checkPass(){
     }
 }
 
+// 🎮 اللعبة
 let qIndex=0;
 let score=0;
 let selected=null;
+
+// ⏱️ التايمر
+let timeLeft = 20;
+let timerInterval;
 
 let questions=[
     {q:"عاصمة مصر؟", o:["القاهرة","الجيزة","أسوان"], a:"القاهرة"},
@@ -93,8 +99,15 @@ let questions=[
     {q:"مين مؤسس فيسبوك؟", o:["مارك","بيل","إيلون"], a:"مارك"}
 ];
 
+// 🔊 الأصوات
+const correctSound = new Audio("https://assets.mixkit.co/sfx/preview/2965/2965.wav");
+const wrongSound = new Audio("https://assets.mixkit.co/sfx/preview/2573/2573.wav");
+
+// 📌 تحميل السؤال
 function load(){
     if(qIndex>=questions.length) return end();
+
+    startTimer(); // ⏱️ تشغيل التايمر
 
     let q=questions[qIndex];
     let html=`<h3>${q.q}</h3>`;
@@ -107,14 +120,37 @@ function load(){
     selected=null;
 }
 
+// 🎯 اختيار
 function select(el){
     document.querySelectorAll(".option").forEach(o=>o.style.border="none");
     el.style.border="2px solid cyan";
     selected=el.innerText;
 }
 
+// ⏱️ التايمر
+function startTimer(){
+    clearInterval(timerInterval);
+    timeLeft = 20;
+
+    const timerEl = document.getElementById("timer");
+    timerEl.innerText = timeLeft;
+
+    timerInterval = setInterval(()=>{
+        timeLeft--;
+        timerEl.innerText = timeLeft;
+
+        if(timeLeft <= 0){
+            clearInterval(timerInterval);
+            next(); // انتقل تلقائي
+        }
+    },1000);
+}
+
+// ➡️ التالي
 function next(){
     if(!selected) return;
+
+    clearInterval(timerInterval);
 
     let q=questions[qIndex];
     let correct = selected === q.a;
@@ -126,7 +162,10 @@ function next(){
 
     if(correct){
         score++;
+        correctSound.play();
         confetti({ particleCount:150, spread:80 });
+    } else {
+        wrongSound.play();
     }
 
     setTimeout(()=>{
@@ -135,6 +174,7 @@ function next(){
     },1000);
 }
 
+// 🏁 النهاية
 function end(){
     let percent = Math.round((score/questions.length)*100);
 
