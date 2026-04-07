@@ -1,231 +1,157 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🔥 Monster Quiz</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
 <style>
 body {
-  margin: 0;
-  font-family: Arial;
-  background: radial-gradient(circle at top, #0f172a, #020617);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  overflow: hidden;
+    margin:0;
+    font-family:'Cairo',sans-serif;
+    background: radial-gradient(circle at 50% 20%, #1e2937, #020617);
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    text-align:center;
 }
 
 .card {
-  width: 380px;
-  padding: 25px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 0 40px rgba(0,0,0,0.8);
-  text-align: center;
-  transform-style: preserve-3d;
-  animation: pop 0.6s ease;
-}
-
-@keyframes pop {
-  from {transform: scale(0.7) rotateX(20deg); opacity: 0;}
-  to {transform: scale(1) rotateX(0); opacity: 1;}
-}
-
-h1 {
-  text-shadow: 0 0 10px #fff;
-}
-
-.option {
-  background: #1e293b;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.option:hover {
-  transform: scale(1.05);
-  background: #22d3ee;
-}
-
-.correct {
-  background: #22c55e !important;
-  transform: scale(1.1);
-}
-
-.wrong {
-  background: #ef4444 !important;
-  animation: shake 0.3s;
-}
-
-@keyframes shake {
-  0%{transform: translateX(0);}
-  25%{transform: translateX(-5px);}
-  50%{transform: translateX(5px);}
-  75%{transform: translateX(-5px);}
-  100%{transform: translateX(0);}
-}
-
-#bar {
-  height: 8px;
-  background: #22c55e;
-  margin: 10px 0;
-  transition: 1s linear;
+    width:420px;
+    padding:30px;
+    border-radius:20px;
+    background: rgba(15,23,42,0.9);
 }
 
 button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(45deg,#22c55e,#06b6d4,#a855f7);
-  color: white;
-  cursor: pointer;
-  font-size: 16px;
+    padding:15px;
+    width:100%;
+    margin-top:10px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(45deg,#22c55e,#06b6d4);
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
 }
 
-.explode {
-  animation: boom 1s;
+.option {
+    background:#1e293b;
+    margin:10px 0;
+    padding:12px;
+    border-radius:10px;
+    cursor:pointer;
 }
 
-@keyframes boom {
-  0% {transform: scale(1);}
-  50% {transform: scale(1.3) rotate(5deg);}
-  100% {transform: scale(1);}
-}
-
-.confetti {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: red;
-  animation: fall 2s linear infinite;
-}
-
-@keyframes fall {
-  from {transform: translateY(-100px) rotate(0);}
-  to {transform: translateY(800px) rotate(360deg);}
-}
+.correct { background:#22c55e !important; }
+.wrong { background:#ef4444 !important; }
 </style>
-
 </head>
 
 <body>
 
-<div class="card" id="game">
+<div class="card" id="passwordScreen">
+    <h2>🔒 ادخل الباسورد</h2>
+    <input id="pass" type="password" style="padding:10px;width:100%;border-radius:10px;">
+    <button onclick="checkPass()">دخول</button>
+    <p id="err" style="color:red;"></p>
+</div>
 
-<h2>🔥 Monster Quiz</h2>
-<div id="timer">20</div>
-<div id="bar"></div>
-
-<div id="question"></div>
-
-<button onclick="next()">تأكيد</button>
-
-<p id="result"></p>
-
+<div class="card" id="game" style="display:none;">
+    <div id="timer">20</div>
+    <div id="question"></div>
+    <button onclick="next()">تأكيد</button>
+    <p id="result"></p>
 </div>
 
 <script>
 
-let questions = [
-  {q:"عاصمة مصر؟", o:["القاهرة","الجيزة","أسوان"], a:"القاهرة"},
-  {q:"2 + 2 = ?", o:["4","5","3"], a:"4"},
-  {q:"مين مؤسس Facebook؟", o:["مارك","بيل","ستيف"], a:"مارك"}
-];
+const PASSWORD = "الدفعة الفقرية";
 
-let i=0;
-let score=0;
-let time=20;
-let timer;
-
-let correct = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
-let wrong = new Audio("https://www.soundjay.com/buttons/sounds/button-10.mp3");
-
-function loadQ(){
-  let q = questions[i];
-
-  document.getElementById("question").innerHTML = `
-    <h3>${q.q}</h3>
-    ${q.o.map(o=>`
-      <div class="option">
-        <input type="radio" name="opt" value="${o}"> ${o}
-      </div>
-    `).join("")}
-  `;
-
-  startTimer();
+function checkPass(){
+    if(document.getElementById("pass").value === PASSWORD){
+        document.getElementById("passwordScreen").style.display="none";
+        document.getElementById("game").style.display="block";
+        load();
+    } else {
+        document.getElementById("err").innerText="❌ غلط!";
+    }
 }
 
-function startTimer(){
-  clearInterval(timer);
-  time = 20;
+let qIndex=0;
+let score=0;
+let selected=null;
 
-  timer = setInterval(()=>{
-    time--;
-    document.getElementById("timer").innerText = time;
-    document.getElementById("bar").style.width = (time*5)+"%";
+let questions=[
+    {q:"عاصمة مصر؟", o:["القاهرة","الجيزة","أسوان"], a:"القاهرة"},
+    {q:"2+2؟", o:["4","5","3"], a:"4"},
+    {q:"مين مؤسس فيسبوك؟", o:["مارك","بيل","إيلون"], a:"مارك"}
+];
 
-    if(time<=0) next();
-  },1000);
+function load(){
+    if(qIndex>=questions.length) return end();
+
+    let q=questions[qIndex];
+    let html=`<h3>${q.q}</h3>`;
+
+    q.o.forEach(o=>{
+        html+=`<div class="option" onclick="select(this)">${o}</div>`;
+    });
+
+    document.getElementById("question").innerHTML=html;
+    selected=null;
+}
+
+function select(el){
+    document.querySelectorAll(".option").forEach(o=>o.style.border="none");
+    el.style.border="2px solid cyan";
+    selected=el.innerText;
 }
 
 function next(){
+    if(!selected) return;
 
-  let selected = document.querySelector('input[name="opt"]:checked');
+    let q=questions[qIndex];
+    let correct = selected === q.a;
 
-  let options = document.querySelectorAll(".option");
+    document.querySelectorAll(".option").forEach(opt=>{
+        if(opt.innerText === q.a) opt.classList.add("correct");
+        if(opt.innerText === selected && !correct) opt.classList.add("wrong");
+    });
 
-  if(selected && selected.value === questions[i].a){
-    score++;
-    correct.play();
-    options.forEach(o=>o.classList.add("correct"));
-    document.getElementById("game").classList.add("explode");
-    showConfetti();
-  } else {
-    wrong.play();
-    options.forEach(o=>o.classList.add("wrong"));
-  }
-
-  setTimeout(()=>{
-    document.getElementById("game").classList.remove("explode");
-
-    i++;
-
-    if(i < questions.length){
-      loadQ();
-    } else {
-      end();
+    if(correct){
+        score++;
+        confetti({ particleCount:150, spread:80 });
     }
 
-  },800);
+    setTimeout(()=>{
+        qIndex++;
+        load();
+    },1000);
 }
 
 function end(){
-  document.getElementById("game").innerHTML = `
-    <h2>🏁 خلصت اللعبة</h2>
-    <h3>نتيجتك: ${score}/${questions.length}</h3>
-  `;
+    let percent = Math.round((score/questions.length)*100);
+
+    let msg = "👍 كويس";
+    if(percent===100){
+        msg="👑 أسطورة!!!";
+        confetti({ particleCount:400, spread:180 });
+    }
+    else if(percent>=80) msg="🔥 جامد جدًا";
+    else if(percent>=70) msg="⭐ شاطر يا بطل";
+
+    document.getElementById("game").innerHTML=`
+        <h1>${percent}%</h1>
+        <h2>${msg}</h2>
+        <button onclick="location.reload()">🔄 إعادة</button>
+    `;
 }
-
-function showConfetti(){
-  for(let i=0;i<30;i++){
-    let c = document.createElement("div");
-    c.className = "confetti";
-    c.style.left = Math.random()*100+"vw";
-    c.style.background = ["red","yellow","blue","green"][Math.floor(Math.random()*4)];
-    document.body.appendChild(c);
-
-    setTimeout(()=>c.remove(),2000);
-  }
-}
-
-loadQ();
 
 </script>
 
