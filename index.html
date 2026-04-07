@@ -1,199 +1,382 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🔥 Monster Quiz</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌙 Monster Quiz - ليلة الوحوش</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --neon-cyan: #22d3ee;
+            --neon-purple: #c026d3;
+            --neon-green: #22c55e;
+            --neon-pink: #f472b6;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            background: #0a0f1c;
+        }
 
-<style>
-body {
-    margin:0;
-    font-family:'Cairo',sans-serif;
-    background: radial-gradient(circle at 50% 20%, #1e2937, #020617);
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    text-align:center;
-}
+        /* خلفية ليلة أسطورية مريحة مع قمر وغيوم متحركة */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 50% 30%, rgba(251, 191, 36, 0.25) 0%, transparent 60%),
+                linear-gradient(to bottom, #1e2937 0%, #0f172a 100%);
+            z-index: -2;
+            animation: nightGlow 20s infinite alternate ease-in-out;
+        }
 
-.card {
-    width:420px;
-    padding:30px;
-    border-radius:20px;
-    background: rgba(15,23,42,0.9);
-}
+        body::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('https://picsum.photos/id/1015/1920/1080') center/cover no-repeat; /* صورة ليلة مع قمر */
+            opacity: 0.75;
+            z-index: -3;
+            animation: cloudsMove 80s linear infinite;
+        }
 
-button {
-    padding:15px;
-    width:100%;
-    margin-top:10px;
-    border:none;
-    border-radius:12px;
-    background:linear-gradient(45deg,#22c55e,#06b6d4);
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-}
+        @keyframes nightGlow {
+            from { filter: brightness(0.95) hue-rotate(0deg); }
+            to { filter: brightness(1.1) hue-rotate(15deg); }
+        }
 
-.option {
-    background:#1e293b;
-    margin:10px 0;
-    padding:12px;
-    border-radius:10px;
-    cursor:pointer;
-}
+        @keyframes cloudsMove {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
 
-.correct { background:#22c55e !important; }
-.wrong { background:#ef4444 !important; }
-</style>
+        .card {
+            width: 100%;
+            max-width: 440px;
+            padding: 35px 28px;
+            border-radius: 30px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(25px);
+            box-shadow: 0 0 80px rgba(34, 211, 238, 0.4),
+                        0 0 40px rgba(192, 38, 211, 0.3);
+            text-align: center;
+            border: 2px solid rgba(34, 211, 238, 0.3);
+            animation: cardPop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 10;
+        }
+
+        @keyframes cardPop {
+            from { transform: scale(0.5) rotateX(40deg); opacity: 0; }
+            to { transform: scale(1) rotateX(0); opacity: 1; }
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-green), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px rgba(34, 211, 238, 0.6);
+        }
+
+        .monster-icon {
+            font-size: 4.5rem;
+            margin: 10px 0;
+            display: block;
+            animation: monsterFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes monsterFloat {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* عناصر اللعبة */
+        #timer {
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 15px 0;
+            text-shadow: 0 0 20px currentColor;
+        }
+
+        #bar-container {
+            height: 12px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        #bar {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #eab308, #ef4444);
+            width: 100%;
+            transition: width 0.4s linear;
+        }
+
+        .option {
+            background: rgba(30, 41, 59, 0.85);
+            padding: 18px 20px;
+            margin: 14px 0;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            font-size: 1.15rem;
+            border: 3px solid transparent;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .option:hover {
+            transform: translateY(-6px) scale(1.04);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 25px rgba(34, 211, 238, 0.5);
+        }
+
+        .correct { 
+            background: #22c55e !important; 
+            border-color: #86efac;
+            transform: scale(1.08);
+            box-shadow: 0 0 30px #22c55e;
+        }
+
+        .wrong { 
+            background: #ef4444 !important; 
+            border-color: #f87171;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20%,60%,80% { transform: translateX(-10px); }
+            40%,70% { transform: translateX(10px); }
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            margin-top: 20px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            border: none;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #22c55e, #06b6d4, #c026d3, #f472b6);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 10px 40px rgba(34, 211, 238, 0.5);
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 15px 50px rgba(192, 38, 211, 0.6);
+        }
+
+        .error { color: #f87171; font-weight: bold; }
+    </style>
 </head>
-
 <body>
 
+<!-- شاشة الباسورد -->
 <div class="card" id="passwordScreen">
-    <h2>🔒 ادخل الباسورد</h2>
-    <input id="pass" type="password" style="padding:10px;width:100%;border-radius:10px;">
-    <button onclick="checkPass()">دخول</button>
-    <p id="err" style="color:red;"></p>
+    <span class="monster-icon">🔒🌙</span>
+    <h1>Monster Quiz</h1>
+    <p style="margin:20px 0 10px; font-size:1.2rem;">ادخل كلمة السر عشان تدخل عالم الوحوش</p>
+    <input type="password" id="passwordInput" placeholder="الدفعة الفقرية" style="width:100%; padding:16px; border-radius:16px; border:none; background:rgba(30,41,59,0.9); color:white; text-align:center; font-size:1.1rem;">
+    <button onclick="checkPassword()">دخول إلى اللعبة 🌙</button>
+    <p id="passwordError" class="error"></p>
 </div>
 
-<div class="card" id="game" style="display:none;">
+<!-- شاشة اللعبة -->
+<div class="card" id="gameScreen" style="display:none;">
+    <span class="monster-icon">👹🌕</span>
+    <h1>Monster Quiz</h1>
+    
     <div id="timer">20</div>
+    <div id="bar-container"><div id="bar"></div></div>
+    
     <div id="question"></div>
-    <button onclick="next()">تأكيد</button>
+    
+    <button id="confirmBtn">تأكيد الإجابة 🔥</button>
     <p id="result"></p>
 </div>
 
 <script>
+// ====================== الباسورد ======================
+const CORRECT_PASSWORD = "الدفعة الفقرية";
 
-// 🔐 باسورد
-const PASSWORD = "الدفعة الفقرية";
+function checkPassword() {
+    const input = document.getElementById("passwordInput").value.trim();
+    const error = document.getElementById("passwordError");
 
-function checkPass(){
-    if(document.getElementById("pass").value === PASSWORD){
-        document.getElementById("passwordScreen").style.display="none";
-        document.getElementById("game").style.display="block";
-        load();
+    if (input === CORRECT_PASSWORD) {
+        document.getElementById("passwordScreen").style.display = "none";
+        document.getElementById("gameScreen").style.display = "block";
+        loadQuestion();
     } else {
-        document.getElementById("err").innerText="❌ غلط!";
+        error.textContent = "❌ كلمة السر غلط! جرب تاني";
+        document.getElementById("passwordInput").value = "";
+        setTimeout(() => error.textContent = "", 3000);
     }
 }
 
-// 🎮 اللعبة
-let qIndex=0;
-let score=0;
-let selected=null;
-
-// ⏱️ التايمر
-let timeLeft = 20;
-let timerInterval;
-
-let questions=[
-    {q:"عاصمة مصر؟", o:["القاهرة","الجيزة","أسوان"], a:"القاهرة"},
-    {q:"2+2؟", o:["4","5","3"], a:"4"},
-    {q:"مين مؤسس فيسبوك؟", o:["مارك","بيل","إيلون"], a:"مارك"}
+// ====================== اللعبة ======================
+let questions = [
+    { q: "عاصمة مصر؟", o: ["القاهرة", "الجيزة", "أسوان", "الإسكندرية"], a: "القاهرة" },
+    { q: "2 + 2 = ؟", o: ["4", "5", "3", "6"], a: "4" },
+    { q: "مين مؤسس فيسبوك؟", o: ["مارك زوكربيرج", "بيل غيتس", "إيلون ماسك", "ستيف جوبز"], a: "مارك زوكربيرج" },
+    { q: "أكبر دولة في العالم مساحة؟", o: ["روسيا", "كندا", "الصين", "أمريكا"], a: "روسيا" },
+    { q: "ما لون السماء في يوم صافي؟", o: ["أزرق", "أخضر", "أحمر", "أصفر"], a: "أزرق" }
 ];
 
-// 🔊 الأصوات
-const correctSound = new Audio("https://assets.mixkit.co/sfx/preview/2965/2965.wav");
-const wrongSound = new Audio("https://assets.mixkit.co/sfx/preview/2573/2573.wav");
+let currentQuestion = 0;
+let score = 0;
+let timeLeft = 20;
+let timerInterval;
+let selectedAnswer = null;
 
-// 📌 تحميل السؤال
-function load(){
-    if(qIndex>=questions.length) return end();
+const gameScreen = document.getElementById("gameScreen");
+const questionEl = document.getElementById("question");
+const timerEl = document.getElementById("timer");
+const barEl = document.getElementById("bar");
+const confirmBtn = document.getElementById("confirmBtn");
+const resultEl = document.getElementById("result");
 
-    startTimer(); // ⏱️ تشغيل التايمر
+// أصوات واضحة وقوية
+const correctSound = new Audio("https://assets.mixkit.co/sfx/preview/2965/2965.wav"); // صوت نجاح مبهج
+const wrongSound = new Audio("https://assets.mixkit.co/sfx/preview/2573/2573.wav");   // صوت وحش غاضب
 
-    let q=questions[qIndex];
-    let html=`<h3>${q.q}</h3>`;
+function loadQuestion() {
+    if (currentQuestion >= questions.length) return endGame();
 
-    q.o.forEach(o=>{
-        html+=`<div class="option" onclick="select(this)">${o}</div>`;
+    const q = questions[currentQuestion];
+    selectedAnswer = null;
+
+    let html = `<h2 style="font-size:1.45rem; margin-bottom:25px;">${q.q}</h2>`;
+    q.o.forEach(opt => {
+        html += `
+            <div class="option" onclick="selectOption(this)">
+                <input type="radio" name="ans" value="${opt}" style="display:none;">
+                ${opt}
+            </div>`;
     });
 
-    document.getElementById("question").innerHTML=html;
-    selected=null;
+    questionEl.innerHTML = html;
+    confirmBtn.style.display = "block";
+    resultEl.innerHTML = "";
+    startTimer();
 }
 
-// 🎯 اختيار
-function select(el){
-    document.querySelectorAll(".option").forEach(o=>o.style.border="none");
-    el.style.border="2px solid cyan";
-    selected=el.innerText;
-}
+window.selectOption = function(el) {
+    document.querySelectorAll('.option').forEach(o => o.style.borderColor = 'transparent');
+    el.style.borderColor = '#67e8f9';
+    selectedAnswer = el.querySelector('input').value;
+};
 
-// ⏱️ التايمر
-function startTimer(){
+function startTimer() {
     clearInterval(timerInterval);
     timeLeft = 20;
+    timerEl.textContent = timeLeft;
+    barEl.style.width = "100%";
 
-    const timerEl = document.getElementById("timer");
-    timerEl.innerText = timeLeft;
-
-    timerInterval = setInterval(()=>{
+    timerInterval = setInterval(() => {
         timeLeft--;
-        timerEl.innerText = timeLeft;
+        timerEl.textContent = timeLeft;
+        barEl.style.width = (timeLeft * 5) + "%";
 
-        if(timeLeft <= 0){
+        if (timeLeft <= 5) timerEl.style.color = "#ef4444";
+
+        if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            next(); // انتقل تلقائي
+            nextQuestion();
         }
-    },1000);
+    }, 1000);
 }
 
-// ➡️ التالي
-function next(){
-    if(!selected) return;
+confirmBtn.addEventListener("click", () => {
+    if (!selectedAnswer) {
+        resultEl.innerHTML = `<span style="color:#fbbf24;">❗ اختر إجابة يا وحش!</span>`;
+        return;
+    }
+    nextQuestion();
+});
 
+function nextQuestion() {
     clearInterval(timerInterval);
+    const q = questions[currentQuestion];
+    const isCorrect = selectedAnswer === q.a;
 
-    let q=questions[qIndex];
-    let correct = selected === q.a;
-
-    document.querySelectorAll(".option").forEach(opt=>{
-        if(opt.innerText === q.a) opt.classList.add("correct");
-        if(opt.innerText === selected && !correct) opt.classList.add("wrong");
+    document.querySelectorAll(".option").forEach(opt => {
+        if (opt.innerText === q.a) opt.classList.add("correct");
+        else if (opt.innerText === selectedAnswer && !isCorrect) opt.classList.add("wrong");
     });
 
-    if(correct){
+    if (isCorrect) {
         score++;
+        correctSound.currentTime = 0;
         correctSound.play();
-        confetti({ particleCount:150, spread:80 });
+        confettiExplosion();
+        gameScreen.style.boxShadow = "0 0 100px #22c55e";
     } else {
+        wrongSound.currentTime = 0;
         wrongSound.play();
     }
 
-    setTimeout(()=>{
-        qIndex++;
-        load();
-    },1000);
+    setTimeout(() => {
+        gameScreen.style.boxShadow = "";
+        currentQuestion++;
+        loadQuestion();
+    }, 1300);
 }
 
-// 🏁 النهاية
-function end(){
-    let percent = Math.round((score/questions.length)*100);
+function confettiExplosion() {
+    confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+    setTimeout(() => confetti({ particleCount: 120, angle: 60, spread: 60 }), 150);
+}
 
-    let msg = "👍 كويس";
-    if(percent===100){
-        msg="👑 أسطورة!!!";
-        confetti({ particleCount:400, spread:180 });
-    }
-    else if(percent>=80) msg="🔥 جامد جدًا";
-    else if(percent>=70) msg="⭐ شاطر يا بطل";
+function endGame() {
+    clearInterval(timerInterval);
+    const percent = Math.round((score / questions.length) * 100);
 
-    document.getElementById("game").innerHTML=`
-        <h1>${percent}%</h1>
-        <h2>${msg}</h2>
-        <button onclick="location.reload()">🔄 إعادة</button>
+    let msg = percent === 100 ? "🌟👑 أنت ملك الوحوش الأسطوري!!" :
+              percent >= 80 ? "🔥 يا سلام! وحش حقيقي" :
+              percent >= 60 ? "👍 كويس جداً، قريب من الوحش" : "💪 حاول تاني.. الليل لسة طويل";
+
+    gameScreen.innerHTML = `
+        <span class="monster-icon" style="font-size:6rem;">${percent >= 80 ? '👹🌕🔥' : '👹🌙'}</span>
+        <h1>خلصت اللعبة!</h1>
+        <h2 style="font-size:3rem; margin:20px 0;">${score} / ${questions.length}</h2>
+        <p style="font-size:1.6rem;">${percent}%</p>
+        <p style="margin:25px 0; font-size:1.3rem;">${msg}</p>
+        <button onclick="restartGame()">🔄 العب مرة تانية</button>
     `;
 }
 
-</script>
+window.restartGame = function() {
+    currentQuestion = 0;
+    score = 0;
+    gameScreen.innerHTML = `
+        <span class="monster-icon">👹🌕</span>
+        <h1>Monster Quiz</h1>
+        <div id="timer">20</div>
+        <div id="bar-container"><div id="bar"></div></div>
+        <div id="question"></div>
+        <button id="confirmBtn">تأكيد الإجابة 🔥</button>
+        <p id="result"></p>
+    `;
+    loadQuestion();
+};
 
+// بدء اللعبة بعد الباسورد
+</script>
 </body>
 </html>
