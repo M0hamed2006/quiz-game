@@ -19,21 +19,19 @@
             position: relative;
             background: #0a0f1c;
         }
-        body::before {
+        body::before, body::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(15,23,42,0.6), rgba(10,15,28,0.95)),
-                        radial-gradient(circle at 50% 25%, rgba(165, 243, 252, 0.12) 0%, transparent 60%);
             z-index: -2;
         }
+        body::before {
+            background: linear-gradient(to bottom, rgba(15,23,42,0.65), rgba(10,15,28,0.95)),
+                        radial-gradient(circle at 50% 25%, rgba(165, 243, 252, 0.12) 0%, transparent 60%);
+        }
         body::after {
-            content: '';
-            position: absolute;
-            inset: 0;
             background: url('https://picsum.photos/id/1015/1920/1080') center/cover;
             opacity: 0.85;
-            z-index: -3;
             filter: blur(1px) brightness(0.75);
         }
         .rain {
@@ -49,11 +47,11 @@
         @keyframes fallingRain { 0% { background-position: 0 0; } 100% { background-position: 0 200%; } }
 
         .card {
-            width: 92%;
+            width: 94%;
             max-width: 440px;
-            padding: 28px 20px;
-            border-radius: 28px;
-            background: rgba(15, 23, 42, 0.94);
+            padding: 25px 18px;
+            border-radius: 26px;
+            background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(28px);
             box-shadow: 0 0 80px rgba(103, 232, 249, 0.35);
             text-align: center;
@@ -61,92 +59,98 @@
         }
 
         h1 { 
-            font-size: 2.25rem; 
+            font-size: 2.2rem; 
             font-weight: 900; 
             background: linear-gradient(90deg, #67e8f9, #c4b5fd, #6ee7b7); 
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
-            margin: 8px 0;
+            margin: 8px 0 12px;
         }
         .monster-icon { 
-            font-size: 4.8rem; 
-            margin: 8px 0 10px; 
-            display: block; 
+            font-size: 4.5rem; 
+            margin: 8px 0 12px; 
             animation: gentleFloat 7s ease-in-out infinite; 
-            filter: drop-shadow(0 0 30px #a5f3fc); 
         }
         @keyframes gentleFloat { 
             0%,100% { transform: translateY(0) rotate(-4deg); } 
-            50% { transform: translateY(-18px) rotate(4deg); } 
+            50% { transform: translateY(-16px) rotate(4deg); } 
         }
 
         #timer { 
-            font-size: 2.9rem; 
+            font-size: 2.8rem; 
             font-weight: 900; 
-            margin: 12px 0; 
+            margin: 10px 0; 
             text-shadow: 0 0 20px #67e8f9; 
+        }
+
+        #question {
+            max-height: 48vh;
+            overflow-y: auto;
+            padding-right: 8px;
         }
 
         .option {
             background: rgba(30, 41, 59, 0.95);
-            padding: 16px 18px;
-            margin: 11px 0;
-            border-radius: 16px;
+            padding: 14px 16px;
+            margin: 9px 0;
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.35s ease;
-            font-size: 1.1rem;
+            font-size: 1.08rem;
             border: 3px solid transparent;
-            min-height: 56px;
+            min-height: 52px;
             display: flex;
             align-items: center;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
         .option:hover, .option:active {
-            transform: translateY(-5px);
+            transform: translateY(-4px);
             border-color: #67e8f9;
-            box-shadow: 0 0 25px rgba(103, 232, 249, 0.45);
+            box-shadow: 0 0 22px rgba(103, 232, 249, 0.45);
         }
 
-        .correct { background: #22c55e !important; transform: scale(1.05); }
+        .correct { background: #22c55e !important; transform: scale(1.04); }
         .wrong { background: #ef4444 !important; animation: shake 0.5s; }
 
         @keyframes shake { 
             0%,100%{transform:translateX(0)} 
-            25%{transform:translateX(-8px)} 
-            75%{transform:translateX(8px)} 
+            25%{transform:translateX(-6px)} 
+            75%{transform:translateX(6px)} 
         }
 
         button {
             width: 100%; 
-            padding: 17px; 
-            margin-top: 18px;
-            font-size: 1.25rem; 
+            padding: 16px; 
+            margin-top: 20px;
+            font-size: 1.22rem; 
             font-weight: 800; 
             border: none; 
             border-radius: 20px;
             background: linear-gradient(45deg, #22c55e, #06b6d4, #a78bfa);
             color: white; 
             cursor: pointer; 
-            box-shadow: 0 10px 40px rgba(103, 232, 249, 0.4);
+            box-shadow: 0 10px 35px rgba(103, 232, 249, 0.4);
         }
-        button:hover { transform: translateY(-4px); }
 
-        /* تعديلات الموبايل */
+        /* تعديلات الموبايل القوية */
         @media (max-width: 480px) {
             .card {
-                padding: 22px 16px;
-                border-radius: 24px;
+                padding: 20px 14px;
                 width: 96%;
+                border-radius: 22px;
             }
-            h1 { font-size: 1.9rem; }
-            .monster-icon { font-size: 4.1rem; }
-            #timer { font-size: 2.55rem; }
+            h1 { font-size: 1.85rem; }
+            .monster-icon { font-size: 3.9rem; }
+            #timer { font-size: 2.45rem; }
             .option {
-                font-size: 1.03rem;
-                padding: 14px 16px;
-                min-height: 52px;
-                margin: 10px 0;
+                font-size: 1.02rem;
+                padding: 13px 15px;
+                min-height: 48px;
+                margin: 8px 0;
+            }
+            #question {
+                max-height: 52vh;
             }
         }
     </style>
@@ -158,11 +162,11 @@
 <div class="card" id="passwordScreen">
     <span class="monster-icon">🌧️🌙</span>
     <h1>Monster Quiz</h1>
-    <p style="margin:20px 0 15px; font-size:1.15rem;">ادخل كلمة السر عشان ندخل </p>
-    <input type="password" id="passwordInput" placeholder="الدفعة الفقرية"
-           style="width:100%; padding:16px; border-radius:16px; border:none; background:rgba(30,41,59,0.9); color:white; text-align:center; font-size:1.1rem;">
+    <p style="margin:18px 0 15px; font-size:1.1rem;">ادخل كلمة السر عشان ندخل ليلة المطر</p>
+    <input type="password" id="passwordInput" placeholder="كلمة السر"
+           style="width:100%; padding:15px; border-radius:16px; border:none; background:rgba(30,41,59,0.9); color:white; text-align:center; font-size:1.1rem;">
     <button onclick="checkPassword()">دخول 🌧️</button>
-    <p id="passwordError" style="color:#f87171; margin-top:12px; font-size:1.1rem;"></p>
+    <p id="passwordError" style="color:#f87171; margin-top:12px;"></p>
 </div>
 
 <!-- شاشة اللعبة -->
@@ -171,7 +175,7 @@
     <h1>Monster Quiz</h1>
    
     <div id="timer">20</div>
-    <div id="bar-container" style="height:12px; background:rgba(255,255,255,0.15); border-radius:9999px; overflow:hidden; margin:15px 0;">
+    <div id="bar-container" style="height:11px; background:rgba(255,255,255,0.15); border-radius:9999px; overflow:hidden; margin:12px 0;">
         <div id="bar" style="height:100%; background:linear-gradient(90deg,#22c55e,#a5f3fc); width:100%;"></div>
     </div>
    
@@ -182,8 +186,9 @@
 </div>
 
 <script>
-// الباسورد
-const CORRECT_PASSWORD = "الدفعة الفقرية";
+// الباسورد الجديد
+const CORRECT_PASSWORD = "258147";
+
 function checkPassword() {
     const input = document.getElementById("passwordInput").value.trim();
     if (input === CORRECT_PASSWORD) {
@@ -193,7 +198,7 @@ function checkPassword() {
     } else {
         document.getElementById("passwordError").textContent = "❌ كلمة السر غلط!";
         document.getElementById("passwordInput").value = "";
-        setTimeout(() => document.getElementById("passwordError").textContent = "", 2800);
+        setTimeout(() => document.getElementById("passwordError").textContent = "", 2500);
     }
 }
 
@@ -227,7 +232,7 @@ function loadQuestion() {
     const q = questions[currentQuestion];
     selectedAnswer = null;
     
-    let html = `<h2 style="margin-bottom:22px; font-size:1.25rem; line-height:1.45;">${q.q}</h2>`;
+    let html = `<h2 style="margin-bottom:20px; font-size:1.22rem; line-height:1.4;">${q.q}</h2>`;
    
     q.o.forEach(opt => {
         html += `<div class="option" onclick="selectOption(this)">${opt}</div>`;
@@ -287,7 +292,7 @@ function nextQuestion() {
     setTimeout(() => {
         currentQuestion++;
         loadQuestion();
-    }, 1350);
+    }, 1300);
 }
 
 function endGame() {
@@ -301,9 +306,9 @@ function endGame() {
     document.getElementById("gameScreen").innerHTML = `
         <span class="monster-icon">🌧️🌕</span>
         <h1>انتهت اللعبة</h1>
-        <h2 style="font-size:2.8rem; margin:20px 0;">${score}/${questions.length}</h2>
-        <p style="font-size:1.8rem; margin:10px 0;">${percent}%</p>
-        <p style="margin:25px 0; font-size:1.2rem;">${msg}</p>
+        <h2 style="font-size:2.7rem; margin:20px 0;">${score}/${questions.length}</h2>
+        <p style="font-size:1.75rem;">${percent}%</p>
+        <p style="margin:25px 0;">${msg}</p>
         <button onclick="location.reload()">🔄 العب مرة أخرى</button>
     `;
 }
