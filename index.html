@@ -1,53 +1,232 @@
 <!DOCTYPE html>
 <html lang="ar">
+<<<<<<< HEAD
 <head> 
   <meta charset="UTF-8">
   <title>لعبة الامتحان</title>
+=======
+<head>
+<meta charset="UTF-8">
+<title>لعبة الامتحان</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  padding: 25px;
+  border-radius: 20px;
+  width: 350px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  animation: fadeIn 0.5s ease;
+}
+
+h1 {
+  text-align: center;
+  color: #38bdf8;
+}
+
+.question {
+  margin: 15px 0;
+  font-size: 18px;
+}
+
+.option {
+  display: block;
+  background: #1e293b;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.option:hover {
+  background: #38bdf8;
+  transform: scale(1.05);
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 10px;
+  background: #22c55e;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #16a34a;
+  transform: scale(1.05);
+}
+
+#result {
+  margin-top: 15px;
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>لعبة الامتحان</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.container {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  padding: 25px;
+  border-radius: 20px;
+  width: 350px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  animation: fadeIn 0.5s ease;
+}
+
+h1 {
+  text-align: center;
+  color: #38bdf8;
+}
+
+.question {
+  margin: 15px 0;
+  font-size: 18px;
+}
+
+.option {
+  display: block;
+  background: #1e293b;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.option:hover {
+  background: #38bdf8;
+  transform: scale(1.05);
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 10px;
+  background: #22c55e;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #16a34a;
+  transform: scale(1.05);
+}
+
+#result {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 18px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+</style>
 </head>
+
 <body>
-  <h1>لعبة الامتحان</h1>
+
+<div class="container">
+  <h1>🎯 لعبة الامتحان</h1>
+
   <div id="quiz"></div>
+
   <button onclick="checkAnswer()">تأكيد الإجابة</button>
+
   <p id="result"></p>
+</div>
 
-  <script>
-    const questions = [
-      {question: "ما هي عاصمة مصر؟", options: ["القاهرة","الإسكندرية","الفيوم","أسوان"], answer: "القاهرة"},
-      {question: "2 + 2 = ؟", options: ["3","4","5","6"], answer: "4"},
-      {question: "من هو مؤسس مايكروسوفت؟", options: ["ستيف جوبز","بيل جيتس","إيلون ماسك","مارك زوكربيرج"], answer: "بيل جيتس"}
-    ];
+<script>
+const questions = [
+  {question: "ما هي عاصمة مصر؟", options: ["القاهرة","الإسكندرية","الفيوم","أسوان"], answer: "القاهرة"},
+  {question: "2 + 2 = ؟", options: ["3","4","5","6"], answer: "4"},
+  {question: "من هو مؤسس مايكروسوفت؟", options: ["ستيف جوبز","بيل جيتس","إيلون ماسك","مارك زوكربيرج"], answer: "بيل جيتس"}
+];
 
-    let current = 0;
-    let score = 0;
+let current = 0;
+let score = 0;
 
-    function showQuestion() {
-      let q = questions[current];
-      let html = `<h3>${q.question}</h3>`;
-      q.options.forEach((opt,i)=>{
-        html += `<input type="radio" name="opt" value="${opt}"> ${opt}<br>`;
-      });
-      document.getElementById("quiz").innerHTML = html;
-    }
+function showQuestion() {
+  let q = questions[current];
+  let html = `<div class="question">${q.question}</div>`;
 
-    function checkAnswer() {
-      let selected = document.querySelector('input[name="opt"]:checked');
-      if (!selected) return;
-      if (selected.value === questions[current].answer) {
-        document.getElementById("result").innerText = "✅ إجابة صحيحة!";
-        score++;
-      } else {
-        document.getElementById("result").innerText = "❌ غلط! الصح هو: " + questions[current].answer;
-      }
-      current++;
-      if (current < questions.length) {
-        showQuestion();
-      } else {
-        document.getElementById("quiz").innerHTML = `<h2>انتهت اللعبة! نتيجتك: ${score}/${questions.length}</h2>`;
-      }
-    }
+  q.options.forEach(opt => {
+    html += `<label class="option">
+      <input type="radio" name="opt" value="${opt}"> ${opt}
+    </label>`;
+  });
 
-    showQuestion();
-  </script>
+  document.getElementById("quiz").innerHTML = html;
+}
+
+function checkAnswer() {
+  let selected = document.querySelector('input[name="opt"]:checked');
+
+  if (!selected) {
+    document.getElementById("result").innerText = "اختار إجابة الأول 😅";
+    return;
+  }
+
+  if (selected.value === questions[current].answer) {
+    score++;
+    document.getElementById("result").innerText = "✅ إجابة صحيحة!";
+  } else {
+    document.getElementById("result").innerText = "❌ غلط! الصح: " + questions[current].answer;
+  }
+
+  current++;
+
+  if (current < questions.length) {
+    setTimeout(() => {
+      showQuestion();
+      document.getElementById("result").innerText = "";
+    }, 800);
+  } else {
+    document.getElementById("quiz").innerHTML =
+      `<h2>انتهت اللعبة 🎉</h2><h3>نتيجتك: ${score}/${questions.length}</h3>`;
+    document.getElementById("result").innerText = "";
+  }
+}
+
+showQuestion();
+</script>
+
 </body>
 </html>
-
