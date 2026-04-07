@@ -1,213 +1,498 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌧️ Monster Quiz ULTRA</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌧️ MONSTER QUIZ ULTRA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #67e8f9;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            background: black;
+            position: relative;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+        /* ====================== خلفيات متحركة تلقائياً ====================== */
+        .background {
+            position: absolute;
+            inset: 0;
+            z-index: -10;
+            transition: all 8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-<style>
-body {
-    margin: 0;
-    font-family: 'Cairo', sans-serif;
-    color: white;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: black;
-}
+        /* Theme 1: عاصفة مطر ليلية */
+        .theme-1 .sky { 
+            background: linear-gradient(180deg, #0f172a, #1e2937, #334155, #64748b);
+            animation: skyPulse 25s ease infinite;
+        }
+        .theme-1 .rain { display: block; animation: rainFall 0.4s linear infinite; }
+        
+        /* Theme 2: نار ووحوش */
+        .theme-2 .sky { 
+            background: linear-gradient(180deg, #7f1d1d, #b91c1c, #f59e0b, #f97316);
+            animation: firePulse 15s ease infinite;
+        }
+        
+        /* Theme 3: كون فضائي */
+        .theme-3 .sky { 
+            background: linear-gradient(180deg, #0c0a2e, #1e1245, #4c1d95, #7e22ce);
+            animation: cosmicPulse 40s ease infinite;
+        }
+        
+        /* Theme 4: غابة سحرية */
+        .theme-4 .sky { 
+            background: linear-gradient(180deg, #052e16, #14532d, #166534, #4ade80);
+            animation: forestPulse 30s ease infinite;
+        }
 
-/* 🌅 السماء */
-.sky {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(270deg,
-        #0f2027,
-        #2c5364,
-        #ff7e5f,
-        #feb47b,
-        #1a2980,
-        #0f2027
-    );
-    background-size: 2000% 2000%;
-    animation: skyMove 60s ease infinite;
-    z-index: -6;
-}
+        .sky { position: absolute; inset: 0; z-index: -9; }
+        .clouds { 
+            position: absolute; inset: 0; z-index: -8;
+            background: url('https://i.imgur.com/8IuucQZ.png') repeat;
+            opacity: 0.25;
+            animation: cloudDrift 140s linear infinite;
+        }
+        .fog { 
+            position: absolute; inset: 0; z-index: -7;
+            background: radial-gradient(circle, rgba(255,255,255,0.12) 20%, transparent 70%);
+            animation: fogDrift 70s linear infinite;
+        }
+        .rain { 
+            display: none; position: absolute; inset: 0; z-index: -6;
+            background: repeating-linear-gradient(-20deg, rgba(147,197,253,0.3) 0px, rgba(147,197,253,0.3) 2px, transparent 3px, transparent 12px);
+            animation: rainFall 0.35s linear infinite;
+        }
+        .stars { 
+            position: absolute; inset: 0; z-index: -5;
+            background: radial-gradient(circle, #fff 1px, transparent 1px);
+            background-size: 4px 4px;
+            animation: starsTwinkle 3s infinite alternate;
+        }
 
-/* ☁️ سحاب */
-.clouds {
-    position: absolute;
-    inset: 0;
-    background: url('https://i.imgur.com/8IuucQZ.png') repeat;
-    opacity: 0.15;
-    animation: cloudMove 120s linear infinite;
-    z-index: -5;
-}
+        @keyframes skyPulse { 0%,100% {opacity:1} 50% {opacity:0.95} }
+        @keyframes firePulse { 0%,100% {filter: brightness(1)} 50% {filter: brightness(1.3)} }
+        @keyframes cosmicPulse { 0%,100% {filter: hue-rotate(0deg)} 50% {filter: hue-rotate(60deg)} }
+        @keyframes forestPulse { 0%,100% {filter: brightness(1)} 50% {filter: brightness(1.15)} }
+        @keyframes cloudDrift { from {background-position: 0 0} to {background-position: 2000px 0} }
+        @keyframes fogDrift { from {transform: translateX(-15%)} to {transform: translateX(15%)} }
+        @keyframes rainFall { from {background-position: 0 0} to {background-position: -300px 600px} }
+        @keyframes starsTwinkle { from {opacity: 0.3} to {opacity: 0.9} }
 
-/* 🌫️ ضباب */
-.fog1, .fog2 {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle, rgba(255,255,255,0.07), transparent 70%);
-}
+        /* ====================== الكارت الرئيسي ====================== */
+        .card {
+            position: relative;
+            z-index: 10;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(30px);
+            border-radius: 28px;
+            width: 92%;
+            max-width: 460px;
+            padding: 32px 24px;
+            box-shadow: 
+                0 0 60px rgba(103, 232, 249, 0.4),
+                inset 0 0 40px rgba(255,255,255,0.1);
+            text-align: center;
+            border: 1px solid rgba(103, 232, 249, 0.3);
+        }
 
-.fog1 { animation: fogMove 60s linear infinite; z-index: -4; }
-.fog2 { animation: fogMove 90s linear infinite reverse; z-index: -3; }
+        h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            margin: 0 0 12px;
+            background: linear-gradient(90deg, #67e8f9, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(103, 232, 249, 0.5);
+        }
 
-/* 🌧️ مطر */
-.rain {
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-        -20deg,
-        rgba(255,255,255,0.15) 0px,
-        rgba(255,255,255,0.15) 2px,
-        transparent 2px,
-        transparent 6px
-    );
-    animation: rain 0.5s linear infinite;
-    z-index: -2;
-}
+        #question {
+            font-size: 1.35rem;
+            min-height: 68px;
+            margin: 20px 0;
+            font-weight: 700;
+            line-height: 1.4;
+        }
 
-/* ✨ نجوم */
-.stars {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(white 1px, transparent 1px);
-    background-size: 3px 3px;
-    opacity: 0.2;
-    animation: starsBlink 4s infinite alternate;
-    z-index: -1;
-}
+        .progress {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 9999px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #67e8f9, #a78bfa);
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-/* 🎥 حركة */
-@keyframes skyMove {
-    0% {background-position:0% 50%;}
-    50% {background-position:100% 50%;}
-    100% {background-position:0% 50%;}
-}
-@keyframes cloudMove {
-    from {background-position:0 0;}
-    to {background-position:1000px 0;}
-}
-@keyframes fogMove {
-    from {transform:translateX(-10%);}
-    to {transform:translateX(10%);}
-}
-@keyframes rain {
-    from {background-position:0 0;}
-    to {background-position:-200px 400px;}
-}
-@keyframes starsBlink {
-    from {opacity:0.1;}
-    to {opacity:0.4;}
-}
+        .options {
+            margin: 24px 0;
+        }
 
-/* 💎 الكارت */
-.card {
-    background: rgba(10,15,30,0.8);
-    backdrop-filter: blur(25px);
-    padding: 20px;
-    border-radius: 25px;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 0 50px rgba(100,200,255,0.3);
-}
+        .option {
+            background: rgba(30, 41, 59, 0.95);
+            padding: 18px 20px;
+            margin: 10px 0;
+            border-radius: 18px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 2px solid transparent;
+        }
 
-/* ✨ عنوان */
-h1 {
-    font-weight: 900;
-    font-size: 1.8rem;
-    background: linear-gradient(90deg,#67e8f9,#a5b4fc,#f472b6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+        .option:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 25px var(--primary);
+        }
 
-/* الخيارات */
-.option {
-    background: rgba(30,40,65,0.9);
-    padding: 12px;
-    margin: 6px 0;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: 0.3s;
-}
+        .option.correct {
+            background: #22c55e !important;
+            border-color: #86efac;
+            transform: scale(1.05);
+        }
+        .option.wrong {
+            background: #ef4444 !important;
+            border-color: #f87171;
+        }
 
-.option:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px #67e8f9;
-}
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            margin-top: 12px;
+        }
 
-/* زر */
-button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    border-radius: 14px;
-    border: none;
-    background: linear-gradient(45deg,#22c55e,#38bdf8,#a78bfa);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
-</style>
+        button {
+            width: 100%;
+            padding: 18px;
+            margin-top: 16px;
+            border: none;
+            border-radius: 18px;
+            font-size: 1.3rem;
+            font-weight: 900;
+            cursor: pointer;
+            background: linear-gradient(45deg, #22c55e, #38bdf8, #a78bfa);
+            color: white;
+            box-shadow: 0 10px 30px rgba(103, 232, 249, 0.4);
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(103, 232, 249, 0.6);
+        }
+
+        .hearts {
+            font-size: 1.8rem;
+            letter-spacing: 6px;
+        }
+
+        .streak {
+            background: rgba(234, 179, 8, 0.9);
+            color: #000;
+            padding: 4px 16px;
+            border-radius: 9999px;
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+
+        /* تأثيرات النهاية */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confettiFall 3s linear forwards;
+        }
+    </style>
 </head>
+<body class="theme-1">
 
-<body>
+    <!-- خلفيات -->
+    <div class="background">
+        <div class="sky"></div>
+        <div class="clouds"></div>
+        <div class="fog"></div>
+        <div class="rain"></div>
+        <div class="stars"></div>
+    </div>
 
-<div class="sky"></div>
-<div class="clouds"></div>
-<div class="fog1"></div>
-<div class="fog2"></div>
-<div class="rain"></div>
-<div class="stars"></div>
+    <div class="card">
+        <h1>🌧️ MONSTER QUIZ ULTRA</h1>
+        
+        <!-- معلومات أعلى -->
+        <div class="footer-info">
+            <div id="level" class="streak">مستوى ١</div>
+            <div class="hearts" id="hearts">❤️❤️❤️</div>
+            <div id="streak">🔥 0 ستريك</div>
+        </div>
 
-<div class="card">
-    <h1>🌧️ Monster Quiz</h1>
-    <p id="q">اضغط ابدأ</p>
-    <div id="ans"></div>
-    <button onclick="start()">ابدأ</button>
-</div>
+        <div class="progress"><div class="progress-bar" id="progress"></div></div>
+        
+        <p id="question">اضغط ابدأ لبدء المغامرة الوحشية!</p>
+        
+        <div class="options" id="options"></div>
+
+        <div id="timer" style="font-size:1.3rem; font-weight:700; color:#f59e0b; margin:12px 0; display:none;">
+            ⏳ <span id="time-left">15</span>
+        </div>
+
+        <button id="main-btn" onclick="startQuiz()">ابدأ التحدي 🔥</button>
+        
+        <!-- نتيجة سريعة -->
+        <p id="score-display" style="margin-top:16px; font-size:1.25rem; font-weight:700; display:none;"></p>
+    </div>
 
 <script>
-let data=[
-{q:"عاصمة مصر؟",o:["القاهرة","الجيزة","أسوان"],a:"القاهرة"},
-{q:"5+5؟",o:["10","11","9"],a:"10"}
+// ====================== بيانات اللعبة (20 سؤال) ======================
+const questions = [
+    { q: "عاصمة مصر؟", options: ["القاهرة", "الجيزة", "أسوان", "الإسكندرية"], answer: "القاهرة", difficulty: 1 },
+    { q: "5 + 5 = ؟", options: ["9", "10", "11", "12"], answer: "10", difficulty: 1 },
+    { q: "أكبر وحش في الأساطير المصرية؟", options: ["أبو الهول", "التنين", "العفاريت", "الغول"], answer: "أبو الهول", difficulty: 2 },
+    { q: "كم عدد أهرامات الجيزة الرئيسية؟", options: ["2", "3", "4", "5"], answer: "3", difficulty: 2 },
+    { q: "ما هو أطول نهر في العالم؟", options: ["النيل", "الأمازون", "اليانغتسي", "المسيسيبي"], answer: "النيل", difficulty: 2 },
+    { q: "ما لون الدم للأخطبوط؟", options: ["أحمر", "أزرق", "أخضر", "أسود"], answer: "أزرق", difficulty: 3 },
+    { q: "من هو أشهر ملك في التاريخ المصري القديم؟", options: ["رمسيس الثاني", "توت عنخ آمون", "خفرع", "مينا"], answer: "توت عنخ آمون", difficulty: 3 },
+    { q: "ما هو أسرع حيوان في العالم؟", options: ["الفهد", "الصقر", "الأسد", "الغزال"], answer: "الفهد", difficulty: 2 },
+    { q: "كم عدد كواكب المجموعة الشمسية؟", options: ["7", "8", "9", "10"], answer: "8", difficulty: 1 },
+    { q: "ما هو اسم عاصمة اليابان؟", options: ["بكين", "طوكيو", "سيول", "بانكوك"], answer: "طوكيو", difficulty: 2 },
+    { q: "أي حيوان ينام واقفاً؟", options: ["الفيل", "الزرافة", "الأسد", "الدب"], answer: "الزرافة", difficulty: 3 },
+    { q: "ما هو أكبر محيط في العالم؟", options: ["الأطلسي", "الهادئ", "الهندي", "المتجمد الشمالي"], answer: "الهادئ", difficulty: 2 },
+    { q: "من اخترع المصباح الكهربائي؟", options: ["توماس إديسون", "نيكولا تسلا", "ألبرت أينشتاين", "جراهام بيل"], answer: "توماس إديسون", difficulty: 3 },
+    { q: "ما هي أكبر مدينة في أفريقيا من حيث السكان؟", options: ["القاهرة", "لاغوس", "كينشاسا", "جوهانسبرغ"], answer: "القاهرة", difficulty: 3 },
+    { q: "كم عدد أضلاع المثلث؟", options: ["2", "3", "4", "5"], answer: "3", difficulty: 1 },
+    { q: "ما هو أطول جبل في العالم؟", options: ["إيفرست", "كليمنجارو", "كا2", "كينشينجونغا"], answer: "إيفرست", difficulty: 2 },
+    { q: "أي لون لا يوجد في قوس قزح؟", options: ["أزرق", "بني", "أحمر", "أصفر"], answer: "بني", difficulty: 3 },
+    { q: "ما هو اسم أول إنسان هبط على القمر؟", options: ["نيل أرمسترونج", "باز ألدرين", "يوري غاغارين", "مايكل كولينز"], answer: "نيل أرمسترونج", difficulty: 3 },
+    { q: "كم عدد أرجل العنكبوت؟", options: ["6", "8", "10", "12"], answer: "8", difficulty: 1 },
+    { q: "ما هي عاصمة السعودية؟", options: ["جدة", "الرياض", "مكة", "المدينة"], answer: "الرياض", difficulty: 2 }
 ];
 
-let i=0;
+// ====================== متغيرات اللعبة ======================
+let currentQuestion = 0;
+let score = 0;
+let lives = 3;
+let streak = 0;
+let timerInterval = null;
+let selectedTheme = 1;
+let totalQuestions = questions.length;
 
-function start(){
-    load();
+// ====================== تغيير الخلفيات تلقائياً ======================
+const themes = [1, 2, 3, 4];
+
+function changeBackground() {
+    selectedTheme = themes[Math.floor(Math.random() * themes.length)];
+    document.body.className = `theme-${selectedTheme}`;
+    
+    // تغيير شدة المطر حسب الثيم
+    const rainLayer = document.querySelector('.rain');
+    if (selectedTheme === 1) {
+        rainLayer.style.display = 'block';
+    } else {
+        rainLayer.style.display = 'none';
+    }
 }
 
-function load(){
-    if(i>=data.length){
-        document.getElementById("q").innerText="خلصت 🔥";
-        document.getElementById("ans").innerHTML="";
+// تغيير الخلفية كل 18 ثانية تلقائياً
+setInterval(() => {
+    if (currentQuestion > 0 && currentQuestion < totalQuestions) {
+        changeBackground();
+    }
+}, 18000);
+
+// ====================== بدء اللعبة ======================
+function startQuiz() {
+    currentQuestion = 0;
+    score = 0;
+    lives = 3;
+    streak = 0;
+    
+    document.getElementById('main-btn').style.display = 'none';
+    document.getElementById('score-display').style.display = 'none';
+    
+    changeBackground(); // خلفية عشوائية في البداية
+    loadQuestion();
+}
+
+// ====================== تحميل سؤال ======================
+function loadQuestion() {
+    if (currentQuestion >= totalQuestions) {
+        endQuiz();
         return;
     }
 
-    let d=data[i];
-    document.getElementById("q").innerText=d.q;
+    const q = questions[currentQuestion];
+    
+    // تحديث التقدم
+    document.getElementById('progress').style.width = `${((currentQuestion) / totalQuestions) * 100}%`;
+    document.getElementById('level').textContent = `مستوى ${Math.floor(currentQuestion / 5) + 1}`;
+    document.getElementById('hearts').innerHTML = '❤️'.repeat(lives);
+    document.getElementById('streak').innerHTML = `🔥 ${streak} ستريك`;
 
-    let html="";
-    d.o.forEach(o=>{
-        html+=`<div class="option" onclick="next()">${o}</div>`;
+    // السؤال
+    document.getElementById('question').innerHTML = `
+        <span style="font-size:0.9rem; opacity:0.7;">سؤال ${currentQuestion + 1} / ${totalQuestions}</span><br>
+        ${q.q}
+    `;
+
+    // الخيارات
+    const optionsHTML = q.options.map((opt, index) => `
+        <div class="option" onclick="selectAnswer('${opt}', this)">
+            ${String.fromCharCode(65 + index)}. ${opt}
+        </div>
+    `).join('');
+    
+    document.getElementById('options').innerHTML = optionsHTML;
+
+    // تفعيل الـ Timer
+    startTimer();
+}
+
+// ====================== الـ Timer ======================
+function startTimer() {
+    clearInterval(timerInterval);
+    let timeLeft = 15;
+    const timerEl = document.getElementById('timer');
+    const timeSpan = document.getElementById('time-left');
+    
+    timerEl.style.display = 'block';
+    timeSpan.textContent = timeLeft;
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timeSpan.textContent = timeLeft;
+        
+        if (timeLeft <= 5) timerEl.style.color = '#ef4444';
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timeOut();
+        }
+    }, 1000);
+}
+
+// ====================== اختيار إجابة ======================
+function selectAnswer(selected, element) {
+    clearInterval(timerInterval);
+    document.getElementById('timer').style.display = 'none';
+    
+    const q = questions[currentQuestion];
+    const allOptions = document.querySelectorAll('.option');
+    
+    // تعطيل كل الخيارات
+    allOptions.forEach(opt => opt.style.pointerEvents = 'none');
+    
+    // التحقق
+    if (selected === q.answer) {
+        element.classList.add('correct');
+        score += 10 + (streak * 2); // مكافأة الستريك
+        streak++;
+        
+        // تأثير صغير
+        createConfettiBurst(30);
+    } else {
+        element.classList.add('wrong');
+        lives--;
+        streak = 0;
+        
+        // إظهار الإجابة الصحيحة
+        allOptions.forEach(opt => {
+            if (opt.textContent.includes(q.answer)) {
+                opt.classList.add('correct');
+            }
+        });
+    }
+
+    document.getElementById('hearts').innerHTML = '❤️'.repeat(lives);
+    document.getElementById('streak').innerHTML = `🔥 ${streak} ستريك`;
+
+    // الانتقال للسؤال التالي بعد ثانية ونص
+    setTimeout(() => {
+        currentQuestion++;
+        loadQuestion();
+    }, 1600);
+}
+
+// ====================== نفد الوقت ======================
+function timeOut() {
+    lives--;
+    streak = 0;
+    document.getElementById('hearts').innerHTML = '❤️'.repeat(lives);
+    
+    const allOptions = document.querySelectorAll('.option');
+    allOptions.forEach(opt => opt.style.pointerEvents = 'none');
+    
+    const q = questions[currentQuestion];
+    allOptions.forEach(opt => {
+        if (opt.textContent.includes(q.answer)) opt.classList.add('correct');
     });
 
-    document.getElementById("ans").innerHTML=html;
+    setTimeout(() => {
+        currentQuestion++;
+        loadQuestion();
+    }, 1400);
 }
 
-function next(){
-    i++;
-    load();
+// ====================== نهاية اللعبة ======================
+function endQuiz() {
+    const percentage = Math.round((score / (totalQuestions * 10)) * 100);
+    
+    let message = '';
+    if (percentage >= 90) message = '🔥 أسطورة وحشية! أنت ملك الـ Monster Quiz!';
+    else if (percentage >= 70) message = '🏆 ممتاز! أنت وحش حقيقي!';
+    else if (percentage >= 50) message = '👏 كويس جداً! استمر';
+    else message = '💪 حاول مرة تانية.. الوحوش بتنتظرك!';
+
+    document.getElementById('question').innerHTML = `
+        <h2 style="margin:0;">🎉 انتهت المغامرة!</h2>
+        <p style="font-size:2.2rem; margin:20px 0;">${score} نقطة</p>
+        <p style="font-size:1.4rem; color:#67e8f9;">${percentage}%</p>
+        <p style="margin:16px 0; font-size:1.3rem;">${message}</p>
+    `;
+    
+    document.getElementById('options').innerHTML = `
+        <button onclick="startQuiz()" style="margin-top:10px;">🎮 العب مرة أخرى</button>
+    `;
+    
+    document.getElementById('score-display').innerHTML = `أعلى نتيجة اليوم: <strong>${score}</strong>`;
+    document.getElementById('score-display').style.display = 'block';
+    
+    // احتفال كبير
+    createConfettiBurst(120);
 }
+
+// ====================== تأثير الـ Confetti ======================
+function createConfettiBurst(count) {
+    for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.backgroundColor = ['#67e8f9', '#c084fc', '#f472b6', '#22c55e', '#eab308'][Math.floor(Math.random()*5)];
+        confetti.style.transform = `rotate(${Math.random()*360}deg)`;
+        confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.body.appendChild(confetti);
+        
+        setTimeout(() => confetti.remove(), 5000);
+    }
+}
+
+// ====================== بداية اللعبة ======================
+console.log('%c🌧️ MONSTER QUIZ ULTRA جاهز! أفضل كود في العالم 🔥', 'color:#67e8f9; font-size:18px; font-weight:900;');
 </script>
-
 </body>
 </html>
