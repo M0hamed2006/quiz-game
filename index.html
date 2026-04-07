@@ -26,13 +26,31 @@ body {
   text-align: center;
 }
 
-h1 {
-  color: #22d3ee;
+#start {
+  margin-bottom: 15px;
 }
 
-#timer {
-  font-size: 18px;
+input {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
   margin-bottom: 10px;
+  width: 90%;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #22c55e;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #16a34a;
 }
 
 .question {
@@ -52,28 +70,18 @@ h1 {
 
 .option:hover {
   background: #22d3ee;
-  transform: scale(1.05);
 }
 
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 15px;
-  border: none;
-  border-radius: 10px;
-  background: #22c55e;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
+#timer {
+  margin-bottom: 10px;
 }
 
-button:hover {
-  background: #16a34a;
+.correct {
+  background: green !important;
 }
 
-#result {
-  margin-top: 15px;
-  font-size: 18px;
+.wrong {
+  background: red !important;
 }
 
 .stars {
@@ -86,19 +94,34 @@ button:hover {
 <body>
 
 <div class="container">
-  <h1>⚡ ورينا شطارتك</h1>
 
-  <div id="timer">⏱️ الوقت: 10</div>
+  <div id="start">
+    <h2>🎮 اكتب اسمك</h2>
+    <input id="playerName" placeholder="اسمك هنا" />
+    <button onclick="startGame()">ابدأ</button>
+  </div>
 
-  <div id="quiz"></div>
+  <div id="game" style="display:none;">
+    <h1>⚡ ورينا شطارتك</h1>
 
-  <button onclick="checkAnswer()">تأكيد الإجابة</button>
+    <div id="timer">⏱️ 10</div>
 
-  <p id="result"></p>
-  <div id="stars"></div>
+    <div id="quiz"></div>
+
+    <button onclick="checkAnswer()">تأكيد الإجابة</button>
+
+    <p id="result"></p>
+    <div id="stars"></div>
+    <div id="leaderboard"></div>
+  </div>
+
 </div>
 
 <script>
+
+let correctSound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
+let wrongSound = new Audio("https://www.soundjay.com/buttons/sounds/button-10.mp3");
+
 const questions = [
   {question: "ما هي عاصمة مصر؟", options: ["القاهرة","الإسكندرية","الفيوم","أسوان"], answer: "القاهرة"},
   {question: "2 + 2 = ؟", options: ["3","4","5","6"], answer: "4"},
@@ -109,6 +132,22 @@ let current = 0;
 let score = 0;
 let timer;
 let timeLeft = 10;
+let playerName = "";
+let scores = JSON.parse(localStorage.getItem("scores")) || [];
+
+function startGame() {
+  playerName = document.getElementById("playerName").value;
+
+  if (!playerName) {
+    alert("اكتب اسمك 😄");
+    return;
+  }
+
+  document.getElementById("start").style.display = "none";
+  document.getElementById("game").style.display = "block";
+
+  showQuestion();
+}
 
 function startTimer() {
   clearInterval(timer);
@@ -116,7 +155,7 @@ function startTimer() {
 
   timer = setInterval(() => {
     timeLeft--;
-    document.getElementById("timer").innerText = "⏱️ الوقت: " + timeLeft;
+    document.getElementById("timer").innerText = "⏱️ " + timeLeft;
 
     if (timeLeft <= 0) {
       clearInterval(timer);
@@ -145,44 +184,65 @@ function checkAnswer() {
   clearInterval(timer);
 
   let selected = document.querySelector('input[name="opt"]:checked');
+  let options = document.querySelectorAll(".option");
 
   if (selected && selected.value === questions[current].answer) {
     score++;
-    document.getElementById("result").innerText = "✅ صح يا بطل!";
+    correctSound.play();
+    options.forEach(o => o.classList.add("correct"));
+    document.getElementById("result").innerText = "✅ صح";
   } else {
-    document.getElementById("result").innerText = "❌ غلط! الصح: " + questions[current].answer;
+    wrongSound.play();
+    options.forEach(o => o.classList.add("wrong"));
+    document.getElementById("result").innerText = "❌ غلط";
   }
 
   current++;
 
-  if (current < questions.length) {
-    setTimeout(() => {
-      document.getElementById("result").innerText = "";
+  setTimeout(() => {
+    if (current < questions.length) {
       showQuestion();
-    }, 1000);
-  } else {
-    showFinal();
-  }
+    } else {
+      showFinal();
+    }
+  }, 1000);
 }
 
 function showFinal() {
-  document.getElementById("quiz").innerHTML = "";
+
+  scores.push({name: playerName, score: score});
+  localStorage.setItem("scores", JSON.stringify(scores));
 
   let stars = "⭐".repeat(score);
 
   let level = "";
   if (score === questions.length) level = "🔥 أسطورة!";
   else if (score >= 2) level = "👍 كويس";
-  else level = "😅 محتاج تحسن";
+  else level = "😅 حاول تاني";
 
-  document.getElementById("timer").innerText = "🏁 انتهت اللعبة";
+  document.getElementById("quiz").innerHTML = "";
+  document.getElementById("timer").innerText = "🏁 انتهت";
+
   document.getElementById("result").innerText =
     `نتيجتك: ${score}/${questions.length} - ${level}`;
 
   document.getElementById("stars").innerText = stars;
+
+  showLeaderboard();
 }
 
-showQuestion();
+function showLeaderboard() {
+  scores.sort((a, b) => b.score - a.score);
+
+  let html = "<h3>🏆 الترتيب</h3>";
+
+  scores.forEach((s, i) => {
+    html += `<p>${i+1}. ${s.name} - ${s.score}</p>`;
+  });
+
+  document.getElementById("leaderboard").innerHTML = html;
+}
+
 </script>
 
 </body>
