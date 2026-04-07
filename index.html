@@ -19,95 +19,112 @@
             position: relative;
             background: #0a0f1c;
         }
-        body::before, body::after {
+
+        /* خلفية أسطورية جديدة (شروق/غروب + ضباب + مطر) */
+        body::before {
             content: '';
             position: absolute;
             inset: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(15, 23, 42, 0.75),
+                rgba(45, 20, 65, 0.85),
+                rgba(95, 35, 85, 0.75),
+                rgba(130, 55, 45, 0.55),
+                rgba(180, 85, 40, 0.45)
+            );
             z-index: -2;
-        }
-        body::before {
-            background: linear-gradient(to bottom, rgba(15,23,42,0.65), rgba(10,15,28,0.95)),
-                        radial-gradient(circle at 50% 25%, rgba(165, 243, 252, 0.12) 0%, transparent 60%);
+            animation: twilightGlow 25s ease infinite alternate;
         }
         body::after {
+            content: '';
+            position: absolute;
+            inset: 0;
             background: url('https://picsum.photos/id/1015/1920/1080') center/cover;
-            opacity: 0.85;
-            filter: blur(1px) brightness(0.75);
+            opacity: 0.75;
+            z-index: -3;
+            filter: blur(2px) brightness(0.85) contrast(1.1);
+            animation: mistMove 90s linear infinite;
         }
+
         .rain {
             position: absolute;
             inset: 0;
-            background: linear-gradient(transparent, rgba(165, 243, 252, 0.08));
-            background-size: 100% 200%;
-            animation: fallingRain 0.8s linear infinite;
+            background: linear-gradient(transparent, rgba(165, 243, 252, 0.12));
+            background-size: 100% 220%;
+            animation: fallingRain 0.75s linear infinite;
             pointer-events: none;
             z-index: -1;
-            opacity: 0.6;
+            opacity: 0.75;
         }
-        @keyframes fallingRain { 0% { background-position: 0 0; } 100% { background-position: 0 200%; } }
+
+        @keyframes fallingRain { 0% { background-position: 0 0; } 100% { background-position: 0 220%; } }
+        @keyframes twilightGlow { from { opacity: 0.92; } to { opacity: 1.1; } }
+        @keyframes mistMove { 0% { background-position: 0% 50%; } 100% { background-position: 140% 50%; } }
 
         .card {
             width: 94%;
             max-width: 440px;
-            padding: 25px 18px;
+            padding: 24px 16px;
             border-radius: 26px;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(28px);
-            box-shadow: 0 0 80px rgba(103, 232, 249, 0.35);
+            background: rgba(12, 18, 35, 0.88);
+            backdrop-filter: blur(32px);
+            box-shadow: 0 0 90px rgba(165, 243, 252, 0.4);
             text-align: center;
             z-index: 10;
         }
 
         h1 { 
-            font-size: 2.2rem; 
+            font-size: 2.15rem; 
             font-weight: 900; 
-            background: linear-gradient(90deg, #67e8f9, #c4b5fd, #6ee7b7); 
+            background: linear-gradient(90deg, #67e8f9, #c4b5fd, #f472b6, #fb923c, #6ee7b7); 
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
             margin: 8px 0 12px;
         }
         .monster-icon { 
-            font-size: 4.5rem; 
+            font-size: 4.6rem; 
             margin: 8px 0 12px; 
-            animation: gentleFloat 7s ease-in-out infinite; 
+            animation: gentleFloat 6s ease-in-out infinite; 
+            filter: drop-shadow(0 0 35px #a5f3fc);
         }
         @keyframes gentleFloat { 
             0%,100% { transform: translateY(0) rotate(-4deg); } 
-            50% { transform: translateY(-16px) rotate(4deg); } 
+            50% { transform: translateY(-18px) rotate(4deg); } 
         }
 
         #timer { 
-            font-size: 2.8rem; 
+            font-size: 2.75rem; 
             font-weight: 900; 
             margin: 10px 0; 
-            text-shadow: 0 0 20px #67e8f9; 
+            text-shadow: 0 0 25px #67e8f9; 
         }
 
         #question {
-            max-height: 48vh;
+            max-height: 55vh;
             overflow-y: auto;
             padding-right: 8px;
         }
 
         .option {
-            background: rgba(30, 41, 59, 0.95);
-            padding: 14px 16px;
-            margin: 9px 0;
+            background: rgba(30, 41, 59, 0.92);
+            padding: 13px 15px;
+            margin: 7px 0;
             border-radius: 15px;
             cursor: pointer;
             transition: all 0.35s ease;
-            font-size: 1.08rem;
+            font-size: 1.02rem;
             border: 3px solid transparent;
-            min-height: 52px;
+            min-height: 46px;
             display: flex;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
         }
 
         .option:hover, .option:active {
             transform: translateY(-4px);
             border-color: #67e8f9;
-            box-shadow: 0 0 22px rgba(103, 232, 249, 0.45);
+            box-shadow: 0 0 28px rgba(165, 243, 252, 0.5);
         }
 
         .correct { background: #22c55e !important; transform: scale(1.04); }
@@ -122,36 +139,34 @@
         button {
             width: 100%; 
             padding: 16px; 
-            margin-top: 20px;
+            margin-top: 18px;
             font-size: 1.22rem; 
             font-weight: 800; 
             border: none; 
             border-radius: 20px;
-            background: linear-gradient(45deg, #22c55e, #06b6d4, #a78bfa);
+            background: linear-gradient(45deg, #22c55e, #06b6d4, #a78bfa, #f472b6);
             color: white; 
             cursor: pointer; 
-            box-shadow: 0 10px 35px rgba(103, 232, 249, 0.4);
+            box-shadow: 0 12px 40px rgba(165, 243, 252, 0.45);
         }
 
-        /* تعديلات الموبايل القوية */
+        /* تعديلات موبايل قوية جداً */
         @media (max-width: 480px) {
             .card {
                 padding: 20px 14px;
                 width: 96%;
                 border-radius: 22px;
             }
-            h1 { font-size: 1.85rem; }
-            .monster-icon { font-size: 3.9rem; }
-            #timer { font-size: 2.45rem; }
+            h1 { font-size: 1.82rem; }
+            .monster-icon { font-size: 3.85rem; }
+            #timer { font-size: 2.4rem; }
             .option {
-                font-size: 1.02rem;
-                padding: 13px 15px;
-                min-height: 48px;
-                margin: 8px 0;
+                font-size: 0.98rem;
+                padding: 12px 14px;
+                min-height: 44px;
+                margin: 6px 0;
             }
-            #question {
-                max-height: 52vh;
-            }
+            #question { max-height: 56vh; }
         }
     </style>
 </head>
@@ -162,7 +177,7 @@
 <div class="card" id="passwordScreen">
     <span class="monster-icon">🌧️🌙</span>
     <h1>Monster Quiz</h1>
-    <p style="margin:18px 0 15px; font-size:1.1rem;">ادخل كلمة السر عشان ندخل ليلة المطر</p>
+    <p style="margin:18px 0 15px; font-size:1.1rem;">ادخل كلمة السر عشان ندخل </p>
     <input type="password" id="passwordInput" placeholder="كلمة السر"
            style="width:100%; padding:15px; border-radius:16px; border:none; background:rgba(30,41,59,0.9); color:white; text-align:center; font-size:1.1rem;">
     <button onclick="checkPassword()">دخول 🌧️</button>
@@ -176,7 +191,7 @@
    
     <div id="timer">20</div>
     <div id="bar-container" style="height:11px; background:rgba(255,255,255,0.15); border-radius:9999px; overflow:hidden; margin:12px 0;">
-        <div id="bar" style="height:100%; background:linear-gradient(90deg,#22c55e,#a5f3fc); width:100%;"></div>
+        <div id="bar" style="height:100%; background:linear-gradient(90deg,#22c55e,#a5f3fc,#f472b6); width:100%;"></div>
     </div>
    
     <div id="question"></div>
@@ -186,7 +201,7 @@
 </div>
 
 <script>
-// الباسورد الجديد
+// الباسورد
 const CORRECT_PASSWORD = "258147";
 
 function checkPassword() {
@@ -202,7 +217,7 @@ function checkPassword() {
     }
 }
 
-// اللعبة
+// اللعبة (نفسها بدون تغيير)
 let questions = [
     { q: "عاصمة مصر؟", o: ["القاهرة", "الجيزة", "أسوان", "الإسكندرية"], a: "القاهرة" },
     { q: "2 + 2 = ؟", o: ["4", "5", "3", "6"], a: "4" },
@@ -228,7 +243,6 @@ const wrongSound = new Audio("https://assets.mixkit.co/sfx/preview/2573/2573.wav
 
 function loadQuestion() {
     if (currentQuestion >= questions.length) return endGame();
-    
     const q = questions[currentQuestion];
     selectedAnswer = null;
     
