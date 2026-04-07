@@ -8,54 +8,47 @@
 body {
   margin: 0;
   font-family: Arial;
-  background: linear-gradient(135deg, #020617, #0f172a);
+  background: radial-gradient(circle at top, #020617, #000);
   color: white;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  overflow: hidden;
 }
 
 .container {
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(15px);
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
   padding: 25px;
   border-radius: 20px;
-  width: 360px;
-  box-shadow: 0 0 25px rgba(0,0,0,0.7);
+  width: 370px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
   text-align: center;
+  animation: float 3s infinite ease-in-out;
 }
 
-#start {
-  margin-bottom: 15px;
+@keyframes float {
+  0%,100% {transform: translateY(0);}
+  50% {transform: translateY(-10px);}
 }
 
 input {
   padding: 10px;
   border-radius: 8px;
   border: none;
-  margin-bottom: 10px;
   width: 90%;
 }
 
 button {
   width: 100%;
   padding: 12px;
-  border: none;
   border-radius: 10px;
-  background: #22c55e;
+  border: none;
+  background: linear-gradient(45deg, #22c55e, #06b6d4);
   color: white;
   font-size: 16px;
   cursor: pointer;
-}
-
-button:hover {
-  background: #16a34a;
-}
-
-.question {
-  font-size: 18px;
-  margin: 15px 0;
 }
 
 .option {
@@ -69,25 +62,52 @@ button:hover {
 }
 
 .option:hover {
-  background: #22d3ee;
-}
-
-#timer {
-  margin-bottom: 10px;
+  transform: scale(1.05);
 }
 
 .correct {
-  background: green !important;
+  background: #22c55e !important;
+  animation: pulse 0.5s;
 }
 
 .wrong {
-  background: red !important;
+  background: #ef4444 !important;
+  animation: shake 0.5s;
 }
 
-.stars {
-  font-size: 22px;
-  color: gold;
+@keyframes pulse {
+  0% {transform: scale(1);}
+  50% {transform: scale(1.1);}
+  100% {transform: scale(1);}
 }
+
+@keyframes shake {
+  0%,100% {transform: translateX(0);}
+  25% {transform: translateX(-5px);}
+  50% {transform: translateX(5px);}
+}
+
+#timerBar {
+  height: 8px;
+  background: #22c55e;
+  margin-bottom: 10px;
+  transition: 1s linear;
+}
+
+.star {
+  position: fixed;
+  top: -20px;
+  font-size: 20px;
+  animation: fall 3s linear;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
 </style>
 </head>
 
@@ -95,25 +115,22 @@ button:hover {
 
 <div class="container">
 
-  <div id="start">
-    <h2>🎮 اكتب اسمك</h2>
-    <input id="playerName" placeholder="اسمك هنا" />
-    <button onclick="startGame()">ابدأ</button>
-  </div>
+<div id="start">
+  <h2>🎮 اكتب اسمك</h2>
+  <input id="playerName">
+  <button onclick="startGame()">ابدأ</button>
+</div>
 
-  <div id="game" style="display:none;">
-    <h1>⚡ ورينا شطارتك</h1>
+<div id="game" style="display:none;">
+  <div id="timer">⏱️ 20</div>
+  <div id="timerBar"></div>
 
-    <div id="timer">⏱️ 10</div>
+  <div id="quiz"></div>
+  <button onclick="checkAnswer()">تأكيد</button>
 
-    <div id="quiz"></div>
-
-    <button onclick="checkAnswer()">تأكيد الإجابة</button>
-
-    <p id="result"></p>
-    <div id="stars"></div>
-    <div id="leaderboard"></div>
-  </div>
+  <p id="result"></p>
+  <div id="leaderboard"></div>
+</div>
 
 </div>
 
@@ -121,126 +138,115 @@ button:hover {
 
 let correctSound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
 let wrongSound = new Audio("https://www.soundjay.com/buttons/sounds/button-10.mp3");
+let winSound = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3");
 
 const questions = [
-  {question: "ما هي عاصمة مصر؟", options: ["القاهرة","الإسكندرية","الفيوم","أسوان"], answer: "القاهرة"},
-  {question: "2 + 2 = ؟", options: ["3","4","5","6"], answer: "4"},
-  {question: "من مؤسس مايكروسوفت؟", options: ["ستيف جوبز","بيل جيتس","إيلون ماسك","مارك"], answer: "بيل جيتس"}
+  {question:"عاصمة مصر؟", options:["القاهرة","الفيوم","أسوان"], answer:"القاهرة"},
+  {question:"2+2؟", options:["3","4","5"], answer:"4"},
+  {question:"مؤسس مايكروسوفت؟", options:["بيل جيتس","ستيف جوبز"], answer:"بيل جيتس"}
 ];
 
-let current = 0;
-let score = 0;
-let timer;
-let timeLeft = 10;
-let playerName = "";
+let current=0, score=0, timer, timeLeft=20;
 let scores = JSON.parse(localStorage.getItem("scores")) || [];
 
-function startGame() {
-  playerName = document.getElementById("playerName").value;
-
-  if (!playerName) {
-    alert("اكتب اسمك 😄");
-    return;
-  }
-
-  document.getElementById("start").style.display = "none";
-  document.getElementById("game").style.display = "block";
-
+function startGame(){
+  playerName=document.getElementById("playerName").value;
+  document.getElementById("start").style.display="none";
+  document.getElementById("game").style.display="block";
   showQuestion();
 }
 
-function startTimer() {
+function startTimer(){
   clearInterval(timer);
-  timeLeft = 10;
+  timeLeft=20;
 
-  timer = setInterval(() => {
+  timer=setInterval(()=>{
     timeLeft--;
-    document.getElementById("timer").innerText = "⏱️ " + timeLeft;
+    document.getElementById("timer").innerText="⏱️ "+timeLeft;
 
-    if (timeLeft <= 0) {
-      clearInterval(timer);
+    document.getElementById("timerBar").style.width=(timeLeft*5)+"%";
+
+    if(timeLeft<=0){
       checkAnswer();
     }
-  }, 1000);
+  },1000);
 }
 
-function showQuestion() {
-  let q = questions[current];
+function showQuestion(){
+  let q=questions[current];
+  let html=`<div>${q.question}</div>`;
 
-  let html = `<div class="question">${q.question}</div>`;
-
-  q.options.forEach(opt => {
-    html += `<label class="option">
-      <input type="radio" name="opt" value="${opt}"> ${opt}
+  q.options.forEach(o=>{
+    html+=`<label class="option">
+      <input type="radio" name="opt" value="${o}"> ${o}
     </label>`;
   });
 
-  document.getElementById("quiz").innerHTML = html;
-
+  document.getElementById("quiz").innerHTML=html;
   startTimer();
 }
 
-function checkAnswer() {
+function checkAnswer(){
   clearInterval(timer);
 
-  let selected = document.querySelector('input[name="opt"]:checked');
-  let options = document.querySelectorAll(".option");
+  let selected=document.querySelector('input[name="opt"]:checked');
 
-  if (selected && selected.value === questions[current].answer) {
+  let options=document.querySelectorAll(".option");
+
+  if(selected && selected.value===questions[current].answer){
     score++;
     correctSound.play();
-    options.forEach(o => o.classList.add("correct"));
-    document.getElementById("result").innerText = "✅ صح";
-  } else {
+    options.forEach(o=>o.classList.add("correct"));
+    launchStars();
+  }else{
     wrongSound.play();
-    options.forEach(o => o.classList.add("wrong"));
-    document.getElementById("result").innerText = "❌ غلط";
+    options.forEach(o=>o.classList.add("wrong"));
   }
 
   current++;
 
-  setTimeout(() => {
-    if (current < questions.length) {
+  setTimeout(()=>{
+    if(current<questions.length){
       showQuestion();
-    } else {
+    }else{
       showFinal();
     }
-  }, 1000);
+  },1200);
 }
 
-function showFinal() {
+function launchStars(){
+  for(let i=0;i<25;i++){
+    let star=document.createElement("div");
+    star.innerText="⭐";
+    star.className="star";
+    star.style.left=Math.random()*window.innerWidth+"px";
+    document.body.appendChild(star);
 
-  scores.push({name: playerName, score: score});
+    setTimeout(()=>star.remove(),3000);
+  }
+}
+
+function showFinal(){
+  winSound.play();
+
+  scores.push({name:playerName, score:score});
   localStorage.setItem("scores", JSON.stringify(scores));
 
-  let stars = "⭐".repeat(score);
-
-  let level = "";
-  if (score === questions.length) level = "🔥 أسطورة!";
-  else if (score >= 2) level = "👍 كويس";
-  else level = "😅 حاول تاني";
-
-  document.getElementById("quiz").innerHTML = "";
-  document.getElementById("timer").innerText = "🏁 انتهت";
-
-  document.getElementById("result").innerText =
-    `نتيجتك: ${score}/${questions.length} - ${level}`;
-
-  document.getElementById("stars").innerText = stars;
+  document.getElementById("result").innerText=
+    "🎯 نتيجتك: "+score;
 
   showLeaderboard();
 }
 
-function showLeaderboard() {
-  scores.sort((a, b) => b.score - a.score);
+function showLeaderboard(){
+  scores.sort((a,b)=>b.score-a.score);
 
-  let html = "<h3>🏆 الترتيب</h3>";
-
-  scores.forEach((s, i) => {
-    html += `<p>${i+1}. ${s.name} - ${s.score}</p>`;
+  let html="<h3>🏆 الترتيب</h3>";
+  scores.forEach((s,i)=>{
+    html+=`<p>${i+1}. ${s.name} - ${s.score}</p>`;
   });
 
-  document.getElementById("leaderboard").innerHTML = html;
+  document.getElementById("leaderboard").innerHTML=html;
 }
 
 </script>
