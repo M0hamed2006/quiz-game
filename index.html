@@ -3,36 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌌 MONSTER QUIZ LEGEND - الأسطورة</title>
+    <title>🌌 MONSTER QUIZ LEGEND</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --glow: #67e8f9; }
-        * { box-sizing: border-box; margin:0; padding:0; }
-       
-        html, body {
-            width: 100%;
-            min-height: 100%;
+        :root {
+            --glow: #67e8f9;
+            --neon-pink: #f472b6;
+            --neon-purple: #c084fc;
         }
-
+        
+        * { box-sizing: border-box; margin:0; padding:0; }
+        
         body {
-            margin: 0;
             font-family: 'Cairo', sans-serif;
             color: white;
-            min-height: 100vh;
             min-height: 100dvh;
             overflow-x: hidden;
-            overflow-y: auto;
             background: #000;
             position: relative;
             -webkit-text-size-adjust: 100%;
         }
 
+        /* خلفية فيديو شفافة */
         #video-container {
             position: fixed;
             inset: 0;
             z-index: -10;
             overflow: hidden;
-            pointer-events: none;
         }
         #video-container video {
             position: absolute;
@@ -41,10 +38,10 @@
             height: 100%;
             object-fit: cover;
             opacity: 0;
-            transition: opacity 2.8s ease-in-out;
+            transition: opacity 2.5s ease;
         }
         #video-container video.active {
-            opacity: 1;
+            opacity: 0.75;
         }
 
         #image-overlay {
@@ -53,82 +50,68 @@
             z-index: -9;
             background-size: cover;
             background-position: center;
-            opacity: 0.25;
-            transition: all 3s ease;
-            pointer-events: none;
+            opacity: 0.18;
+            transition: opacity 3s;
+            mix-blend-mode: screen;
+        }
+
+        /* Glassmorphism Card */
+        .card, .password-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(30px);
+            border: 2px solid rgba(103, 232, 249, 0.4);
+            box-shadow: 0 0 80px rgba(103, 232, 249, 0.5);
         }
 
         #password-screen {
             position: fixed;
             inset: 0;
             z-index: 100;
-            background: rgba(15, 23, 42, 0.96);
+            background: rgba(0, 0, 0, 0.92);
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            backdrop-filter: blur(25px);
             padding: 16px;
         }
 
         .password-card {
-            background: rgba(15, 23, 42, 0.95);
-            padding: 50px 40px;
-            border-radius: 30px;
-            width: 92%;
-            max-width: 420px;
-            text-align: center;
-            box-shadow: 0 0 90px rgba(103, 232, 249, 0.7);
-            border: 2px solid rgba(103, 232, 249, 0.5);
-        }
-
-        input {
+            padding: 45px 30px;
+            border-radius: 28px;
             width: 100%;
-            padding: 18px;
-            font-size: 1.5rem;
+            max-width: 400px;
             text-align: center;
-            border-radius: 20px;
-            border: 3px solid #67e8f9;
-            background: rgba(30, 41, 59, 0.95);
-            color: white;
-            margin: 20px 0;
-            outline: none;
         }
 
         .card {
             position: relative;
             z-index: 10;
-            background: rgba(15, 23, 42, 0.55); /* 👈 التعديل هنا */
-            backdrop-filter: blur(35px);
-            border-radius: 32px;
+            border-radius: 28px;
             width: min(94%, 480px);
-            margin: 20px auto;
-            padding: 35px 25px;
-            box-shadow: 0 0 90px rgba(103, 232, 249, 0.6);
-            text-align: center;
+            margin: 15px auto;
+            padding: 28px 20px;
         }
 
         @media (max-width: 600px) {
             .card {
                 padding: 20px 14px;
-                width: calc(100% - 16px);
-                border-radius: 22px;
-                margin: 10px auto 18px;
+                margin: 10px auto;
+                border-radius: 20px;
             }
-
             .password-card {
-                padding: 26px 16px;
-                width: 100%;
-                border-radius: 22px;
+                padding: 30px 18px;
             }
-
-            h1 { font-size: 1.65rem !important; }
-            #question { font-size: 1.05rem !important; }
-            .option { padding: 13px 12px; font-size: 1rem; }
+            h1 { font-size: 1.8rem !important; }
+            #question { font-size: 1.1rem !important; min-height: 70px !important; }
+            .option {
+                padding: 14px 12px;
+                font-size: 1.05rem;
+                margin: 8px 0;
+                border-radius: 16px;
+            }
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: 2.6rem;
             font-weight: 900;
             background: linear-gradient(90deg, #67e8f9, #c084fc, #f472b6);
             -webkit-background-clip: text;
@@ -136,76 +119,324 @@
         }
 
         .option {
-            background: rgba(30, 41, 59, 0.95);
-            padding: 20px;
-            margin: 12px 0;
-            border-radius: 22px;
-            font-size: 1.25rem;
+            background: rgba(30, 41, 59, 0.85);
+            padding: 18px;
+            margin: 10px 0;
+            border-radius: 18px;
+            font-size: 1.2rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.4s;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-            border: 3px solid transparent;
+            transition: all 0.35s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+        .option:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 25px var(--glow);
+        }
+        .option.correct { background: #22c55e !important; border-color: #86efac; }
+        .option.wrong { background: #ef4444 !important; border-color: #f87171; }
+
+        #timer {
+            font-size: 1.65rem;
+            font-weight: 900;
+            color: #f59e0b;
         }
 
-        .option:hover { transform: translateY(-6px) scale(1.04); box-shadow: 0 0 30px var(--glow); }
-        .option.correct { background: #22c55e !important; }
-        .option.wrong { background: #ef4444 !important; }
+        .progress {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        #progress {
+            height: 100%;
+            background: linear-gradient(90deg, #67e8f9, #c084fc, #f472b6);
+            width: 0%;
+            transition: width 0.6s ease;
+        }
 
-        #red-flash {
+        button#main-btn, button {
+            background: linear-gradient(45deg, #22c55e, #a78bfa);
+            border: none;
+            border-radius: 9999px;
+            font-weight: 900;
+            padding: 18px;
+            font-size: 1.4rem;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 0 30px rgba(103,232,249,0.6);
+        }
+
+        .confetti {
             position: fixed;
-            inset: 0;
-            background: rgba(239, 68, 68, 0.6);
-            z-index: 9999;
-            opacity: 0;
+            font-size: 2rem;
             pointer-events: none;
-            transition: opacity 0.4s;
+            z-index: 9999;
+            animation: confetti-fall 4s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(110vh) rotate(720deg);
+                opacity: 0;
+            }
         }
     </style>
 </head>
-
 <body>
 
-<div id="video-container"></div>
-<div id="image-overlay"></div>
+    <div id="video-container"></div>
+    <div id="image-overlay"></div>
 
-<div id="password-screen">
-    <div class="password-card">
-        <h1>🔑 MONSTER QUIZ</h1>
-        <input type="password" id="pass-input" maxlength="6">
-        <button onclick="checkPassword()">دخول</button>
+    <!-- Password Screen -->
+    <div id="password-screen">
+        <div class="password-card">
+            <h1>🌌 MONSTER QUIZ LEGEND</h1>
+            <p style="font-size:1.35rem; margin:25px 0 20px;">أدخل كلمة السر للدخول إلى العالم الأسطوري</p>
+            <input type="password" id="pass-input" placeholder="••••••" maxlength="6" style="font-size:1.6rem; padding:16px; border-radius:16px;">
+            <div style="color:#fbbf24; margin:18px 0; font-size:1.25rem;">المحاولات المتبقية: <strong id="attempts-count">3</strong></div>
+            <button onclick="checkPassword()" style="padding:18px;">دخول للعالم الوحشي 🔥</button>
+            <p id="error-msg" style="color:#ef4444; margin-top:20px; min-height:28px;"></p>
+        </div>
     </div>
-</div>
 
-<div class="card" id="quiz-card" style="display:none;">
-    <h1>🌌 MONSTER QUIZ</h1>
-    <p id="question"></p>
-    <div id="options"></div>
-</div>
+    <!-- Quiz Card -->
+    <div class="card" id="quiz-card" style="display:none;">
+        <h1>🌌 MONSTER QUIZ LEGEND</h1>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0; font-size:1.25rem;">
+            <div id="level" style="background:#eab308;color:#000;padding:6px 18px;border-radius:9999px;font-weight:900;">مستوى ١</div>
+            <div id="hearts" style="font-size:2.4rem;">❤️❤️❤️</div>
+            <div id="streak" style="background:#eab308;color:#000;padding:6px 18px;border-radius:9999px;font-weight:900;">🔥 0</div>
+        </div>
 
-<div id="red-flash"></div>
+        <div class="progress"><div id="progress"></div></div>
+
+        <p id="question" style="font-size:1.35rem; min-height:78px; margin:22px 0; font-weight:700; line-height:1.4;"></p>
+        
+        <div id="options"></div>
+        
+        <div id="timer" style="text-align:center; margin:15px 0; display:none;">
+            ⏳ <span id="time-left">15</span>
+        </div>
+
+        <button id="main-btn" onclick="startQuiz()">ابدأ التحدي الوحشي 🔥</button>
+        
+        <div style="margin-top:15px; display:flex; gap:10px; justify-content:center;">
+            <button onclick="toggleMusic()" style="padding:12px 20px; font-size:1rem; background:rgba(255,255,255,0.1);">🎵</button>
+            <button onclick="toggleFullscreen()" style="padding:12px 20px; font-size:1rem; background:rgba(255,255,255,0.1);">⛶</button>
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://www.chosic.com/wp-content/uploads/2023/05/relaxing-piano-music-for-video.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="correctSound" src="https://freesound.org/data/previews/66/66930_931655-lq.mp3"></audio>
+    <audio id="wrongSound" src="https://freesound.org/data/previews/387/387186_7258993-lq.mp3"></audio>
 
 <script>
-const questions = [
-    { q: "عاصمة مصر؟", options: ["القاهرة","الجيزة","أسوان","الإسكندرية"], answer:"القاهرة"}
+// ====================== المتغيرات والأسئلة ======================
+const questions = [ /* نفس الأسئلة السابقة بدون تغيير */ 
+    { q: "عاصمة مصر؟", options: ["القاهرة", "الجيزة", "أسوان", "الإسكندرية"], answer: "القاهرة" },
+    { q: "5 + 5 = ؟", options: ["9", "10", "11", "12"], answer: "10" },
+    { q: "أكبر وحش في الأساطير المصرية؟", options: ["أبو الهول", "التنين", "العفاريت", "الغول"], answer: "أبو الهول" },
+    // ... (ضع باقي الأسئلة الـ25 هنا كما هي)
 ];
 
-function checkPassword(){
-    if(document.getElementById('pass-input').value==="258147"){
-        document.getElementById('password-screen').style.display="none";
-        document.getElementById('quiz-card').style.display="block";
-        loadQuestion();
+let currentQuestion = 0, score = 0, lives = 3, streak = 0, timerInterval = null;
+const totalQuestions = questions.length;
+let passwordAttempts = 3;
+const correctPassword = "258147";
+
+const backgrounds = [
+    "https://videos.pexels.com/video-files/1851190/1851190-hd_1920_1080_30fps.mp4",
+    "https://videos.pexels.com/video-files/854/854-hd_1920_1080_30fps.mp4",
+    "https://videos.pexels.com/video-files/319/319-hd_1920_1080_30fps.mp4"
+];
+
+function initBackgrounds() {
+    const container = document.getElementById('video-container');
+    backgrounds.forEach((src, i) => {
+        const v = document.createElement('video');
+        v.src = src;
+        v.loop = true;
+        v.muted = true;
+        v.playsInline = true;
+        if (i === 0) v.classList.add('active');
+        container.appendChild(v);
+        v.load();
+    });
+}
+
+function changeBackground() {
+    const videos = document.querySelectorAll('#video-container video');
+    videos.forEach(v => v.classList.remove('active'));
+    const next = (Array.from(videos).findIndex(v => v.classList.contains('active')) + 1) % videos.length || 0;
+    videos[next].classList.add('active');
+}
+
+function startMusic() {
+    document.getElementById('bgMusic').volume = 0.25;
+    document.getElementById('bgMusic').play().catch(()=>{});
+}
+
+function checkPassword() {
+    const input = document.getElementById('pass-input').value.trim();
+    const error = document.getElementById('error-msg');
+    const attemptsEl = document.getElementById('attempts-count');
+
+    if (input === correctPassword) {
+        document.getElementById('password-screen').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('password-screen').style.display = 'none';
+            document.getElementById('quiz-card').style.display = 'block';
+            initBackgrounds();
+            startMusic();
+            setInterval(changeBackground, 18000);
+            startQuiz();
+        }, 800);
+    } else {
+        passwordAttempts--;
+        attemptsEl.textContent = passwordAttempts;
+        error.textContent = passwordAttempts > 0 ? `خطأ! ${passwordAttempts} محاولات متبقية` : '🚫 تم حظرك';
     }
 }
 
-function loadQuestion(){
-    const q = questions[0];
-    document.getElementById('question').innerText = q.q;
-    document.getElementById('options').innerHTML = q.options.map(opt =>
-        `<div class="option">${opt}</div>`
-    ).join('');
+function startQuiz() {
+    currentQuestion = 0; score = 0; lives = 3; streak = 0;
+    document.getElementById('main-btn').style.display = 'none';
+    loadQuestion();
 }
-</script>
 
+function loadQuestion() {
+    if (currentQuestion >= totalQuestions) return endQuiz();
+
+    const q = questions[currentQuestion];
+    document.getElementById('progress').style.width = `${((currentQuestion) / totalQuestions) * 100}%`;
+    document.getElementById('level').textContent = `مستوى ${Math.floor(currentQuestion / 5) + 1}`;
+    document.getElementById('hearts').innerHTML = '❤️'.repeat(lives);
+    document.getElementById('streak').innerHTML = `🔥 ${streak}`;
+
+    document.getElementById('question').innerHTML = `
+        <span style="font-size:0.95rem; opacity:0.8;">سؤال ${currentQuestion + 1}/${totalQuestions}</span><br>
+        ${q.q}
+    `;
+
+    let html = '';
+    q.options.forEach((opt, i) => {
+        html += `<div class="option" onclick="selectAnswer(this, '${opt}', '${q.answer}')">${String.fromCharCode(65 + i)}. ${opt}</div>`;
+    });
+    document.getElementById('options').innerHTML = html;
+
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(timerInterval);
+    let timeLeft = 15;
+    const timeSpan = document.getElementById('time-left');
+    document.getElementById('timer').style.display = 'block';
+    timeSpan.textContent = timeLeft;
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timeSpan.textContent = timeLeft;
+        if (timeLeft <= 5) timeSpan.style.color = '#ef4444';
+        if (timeLeft <= 0) timeOut();
+    }, 1000);
+}
+
+function selectAnswer(element, selected, correct) {
+    clearInterval(timerInterval);
+    document.getElementById('timer').style.display = 'none';
+    document.querySelectorAll('.option').forEach(opt => opt.style.pointerEvents = 'none');
+
+    if (selected === correct) {
+        element.classList.add('correct');
+        score += 10 + (streak * 5);
+        streak++;
+        document.getElementById('correctSound').play().catch(()=>{});
+        createConfetti(60);
+    } else {
+        element.classList.add('wrong');
+        lives--;
+        streak = 0;
+        document.getElementById('wrongSound').play().catch(()=>{});
+        document.querySelectorAll('.option').forEach(opt => {
+            if (opt.textContent.includes(correct)) opt.classList.add('correct');
+        });
+    }
+
+    document.getElementById('hearts').innerHTML = '❤️'.repeat(lives);
+    document.getElementById('streak').innerHTML = `🔥 ${streak}`;
+
+    setTimeout(() => {
+        currentQuestion++;
+        loadQuestion();
+    }, 1550);
+}
+
+function timeOut() {
+    lives--;
+    streak = 0;
+    document.getElementById('hearts').innerHTML = '❤️'.repeat(lives);
+    document.getElementById('wrongSound').play().catch(()=>{});
+    
+    const q = questions[currentQuestion];
+    document.querySelectorAll('.option').forEach(opt => {
+        if (opt.textContent.includes(q.answer)) opt.classList.add('correct');
+        opt.style.pointerEvents = 'none';
+    });
+
+    setTimeout(() => { currentQuestion++; loadQuestion(); }, 1400);
+}
+
+function createConfetti(count) {
+    const emojis = ['🌟','✨','🔥','💎','🦍','⚡'];
+    for (let i = 0; i < count; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.top = '-50px';
+        c.style.animationDuration = (Math.random() * 2.5 + 3) + 's';
+        document.body.appendChild(c);
+        setTimeout(() => c.remove(), 6000);
+    }
+}
+
+function endQuiz() {
+    const percentage = Math.round((score / (totalQuestions * 15)) * 100);
+    let message = percentage >= 85 ? '👑 أنت أسطورة MONSTER QUIZ!' : 
+                  percentage >= 70 ? '🏆 وحش حقيقي!' : 
+                  percentage >= 50 ? '💪 أداء ممتاز' : '🔄 حاول تاني يا بطل';
+
+    document.getElementById('question').innerHTML = `
+        <h2 style="font-size:2.4rem;margin:15px 0;">🎉 انتهت المغامرة!</h2>
+        <p style="font-size:3rem; color:#67e8f9; margin:10px 0;">${score} نقطة</p>
+        <p style="font-size:1.8rem;">${percentage}%</p>
+        <p style="margin:20px 0; font-size:1.4rem;">${message}</p>
+    `;
+    document.getElementById('options').innerHTML = `
+        <button onclick="location.reload()" style="margin:15px 0;">🎮 العب مرة أخرى</button>
+        <button onclick="navigator.share({title:'MONSTER QUIZ', text:'سجلت ${score} نقطة!'}).catch(()=>{})" style="background:#8b5cf6;">📤 شارك النتيجة</button>
+    `;
+}
+
+function toggleMusic() {
+    const music = document.getElementById('bgMusic');
+    music.paused ? music.play() : music.pause();
+}
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+}
+
+// بداية اللعبة
+console.log('%c🌌 MONSTER QUIZ LEGEND - النسخة الأسطورية 2026 🔥', 'color:#67e8f9;font-size:22px;font-weight:900;');
+</script>
 </body>
 </html>
