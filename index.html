@@ -8,8 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: 'Cairo', sans-serif;
             color: white;
             min-height: 100vh;
@@ -21,14 +20,14 @@
             background: #0a0f1c;
         }
 
-        /* خلفية ليل ممطر ضبابي */
         body::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(15,23,42,0.65), rgba(10,15,28,0.95)),
-                        radial-gradient(circle at 50% 30%, rgba(165, 243, 252, 0.15) 0%, transparent 65%);
+            background: linear-gradient(to bottom, rgba(15,23,42,0.6), rgba(10,15,28,0.95)),
+                        radial-gradient(circle at 50% 25%, rgba(165, 243, 252, 0.12) 0%, transparent 60%);
             z-index: -2;
+            animation: softRainGlow 18s infinite alternate;
         }
 
         body::after {
@@ -36,91 +35,66 @@
             position: absolute;
             inset: 0;
             background: url('https://picsum.photos/id/1015/1920/1080') center/cover;
-            opacity: 0.82;
+            opacity: 0.85;
             z-index: -3;
-            filter: brightness(0.75) blur(0.5px);
-            animation: mistMove 80s linear infinite;
+            animation: rainMist 70s linear infinite;
+            filter: blur(1px) brightness(0.75);
         }
 
-        @keyframes mistMove {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 150% 50%; }
-        }
-
-        /* تأثير مطر أفضل */
         .rain {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(transparent, rgba(165, 243, 252, 0.12));
-            background-size: 100% 300%;
-            animation: rainFall 0.6s linear infinite;
-            z-index: -1;
-            opacity: 0.75;
+            inset: 0;
+            background: linear-gradient(transparent, rgba(165, 243, 252, 0.08));
+            background-size: 100% 200%;
+            animation: fallingRain 0.8s linear infinite;
             pointer-events: none;
+            z-index: -1;
+            opacity: 0.6;
         }
 
-        @keyframes rainFall {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 300%; }
-        }
+        @keyframes fallingRain { 0% { background-position: 0 0; } 100% { background-position: 0 200%; } }
+        @keyframes softRainGlow { from { opacity: 0.92; } to { opacity: 1.08; } }
+        @keyframes rainMist { 0% { background-position: 0% 50%; } 100% { background-position: 120% 50%; } }
 
         .card {
-            width: 100%;
-            max-width: 440px;
+            width: 100%; max-width: 440px;
             padding: 35px 28px;
             border-radius: 30px;
-            background: rgba(15, 23, 42, 0.93);
-            backdrop-filter: blur(25px);
-            box-shadow: 0 0 70px rgba(103, 232, 249, 0.3);
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(28px);
+            box-shadow: 0 0 80px rgba(103, 232, 249, 0.35);
             text-align: center;
             z-index: 10;
         }
 
-        .monster-icon {
-            font-size: 5.3rem;
-            margin: 10px 0;
-            animation: gentleFloat 7s ease-in-out infinite;
-        }
+        h1 { font-size: 2.35rem; font-weight: 900; background: linear-gradient(90deg, #67e8f9, #c4b5fd, #6ee7b7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .monster-icon { font-size: 5.2rem; margin: 12px 0 8px; display: block; animation: gentleFloat 7s ease-in-out infinite; filter: drop-shadow(0 0 30px #a5f3fc); }
+        @keyframes gentleFloat { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-22px) rotate(4deg); } }
 
-        @keyframes gentleFloat {
-            0%, 100% { transform: translateY(0) rotate(-3deg); }
-            50% { transform: translateY(-20px) rotate(3deg); }
-        }
-
-        h1 {
-            font-size: 2.4rem;
-            background: linear-gradient(90deg, #67e8f9, #c4b5fd, #6ee7b7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        #timer { font-size: 3rem; font-weight: 900; margin: 15px 0; }
+        #timer { font-size: 3rem; font-weight: 900; margin: 15px 0; text-shadow: 0 0 20px #67e8f9; }
+        
         .option {
             background: rgba(30, 41, 59, 0.92);
-            padding: 18px 20px;
+            padding: 18px 22px;
             margin: 14px 0;
             border-radius: 18px;
             cursor: pointer;
-            transition: all 0.4s;
+            transition: all 0.4s ease;
             font-size: 1.15rem;
             border: 3px solid transparent;
         }
-        .option:hover { transform: translateY(-5px); border-color: #67e8f9; }
-        .correct { background: #22c55e !important; transform: scale(1.06); }
+        .option:hover { transform: translateY(-6px); border-color: #67e8f9; box-shadow: 0 0 25px rgba(103, 232, 249, 0.4); }
+        .correct { background: #22c55e !important; transform: scale(1.07); }
         .wrong { background: #ef4444 !important; animation: shake 0.5s; }
         @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
 
         button {
-            width: 100%;
-            padding: 18px;
-            margin-top: 20px;
-            font-size: 1.25rem;
-            font-weight: 800;
-            border: none;
-            border-radius: 20px;
+            width: 100%; padding: 18px; margin-top: 20px;
+            font-size: 1.25rem; font-weight: 800; border: none; border-radius: 20px;
             background: linear-gradient(45deg, #22c55e, #06b6d4, #a78bfa);
-            color: white;
+            color: white; cursor: pointer; box-shadow: 0 10px 40px rgba(103, 232, 249, 0.4);
         }
+        button:hover { transform: translateY(-5px); }
     </style>
 </head>
 <body>
@@ -131,10 +105,11 @@
 <div class="card" id="passwordScreen">
     <span class="monster-icon">🌧️🌙</span>
     <h1>Monster Quiz</h1>
-    <p style="margin:20px 0 15px; font-size:1.2rem;">ادخل كلمة السر للدخول إلى ليلة المطر</p>
-    <input type="password" id="passwordInput" placeholder="الدفعة الفقرية" style="width:100%; padding:16px; border-radius:16px; border:none; background:rgba(30,41,59,0.9); color:white; text-align:center;">
+    <p style="margin:20px 0 15px; font-size:1.2rem;">ادخل كلمة السر عشان ندخل </p>
+    <input type="password" id="passwordInput" placeholder="الدفعة الفقرية" 
+           style="width:100%; padding:16px; border-radius:16px; border:none; background:rgba(30,41,59,0.9); color:white; text-align:center; font-size:1.1rem;">
     <button onclick="checkPassword()">دخول 🌧️</button>
-    <p id="passwordError" style="color:#f87171; margin-top:10px;"></p>
+    <p id="passwordError" style="color:#f87171; margin-top:12px;"></p>
 </div>
 
 <!-- شاشة اللعبة -->
@@ -143,39 +118,40 @@
     <h1>Monster Quiz</h1>
     
     <div id="timer">20</div>
-    <div id="bar-container" style="height:12px;background:rgba(255,255,255,0.15);border-radius:9999px;overflow:hidden;margin:15px 0;">
-        <div id="bar" style="height:100%;background:linear-gradient(90deg,#22c55e,#67e8f9);width:100%;"></div>
+    <div id="bar-container" style="height:12px; background:rgba(255,255,255,0.15); border-radius:9999px; overflow:hidden; margin:15px 0;">
+        <div id="bar" style="height:100%; background:linear-gradient(90deg,#22c55e,#a5f3fc); width:100%;"></div>
     </div>
     
     <div id="question"></div>
     
-    <button id="confirmBtn">تأكيد الإجابة</button>
+    <button id="confirmBtn">تأكيد الإجابة 🌧️</button>
     <p id="result"></p>
 </div>
 
 <script>
-// الباسورد + باقي كود اللعبة (نفس السابق مع تصليح بسيط)
+// الباسورد
 const CORRECT_PASSWORD = "الدفعة الفقرية";
 
 function checkPassword() {
-    if (document.getElementById("passwordInput").value.trim() === CORRECT_PASSWORD) {
+    const input = document.getElementById("passwordInput").value.trim();
+    if (input === CORRECT_PASSWORD) {
         document.getElementById("passwordScreen").style.display = "none";
         document.getElementById("gameScreen").style.display = "block";
         loadQuestion();
     } else {
         document.getElementById("passwordError").textContent = "❌ كلمة السر غلط!";
         document.getElementById("passwordInput").value = "";
-        setTimeout(() => document.getElementById("passwordError").textContent = "", 2500);
+        setTimeout(() => document.getElementById("passwordError").textContent = "", 2800);
     }
 }
 
-// باقي كود اللعبة (loadQuestion, selectOption, timer, next, endGame ...)
-// لو عايز أكملها كاملة قولي "اكمل الكود كامل" وأبعتهولك جاهز 100%
-
+// اللعبة
 let questions = [
     { q: "عاصمة مصر؟", o: ["القاهرة", "الجيزة", "أسوان", "الإسكندرية"], a: "القاهرة" },
     { q: "2 + 2 = ؟", o: ["4", "5", "3", "6"], a: "4" },
-    { q: "مين مؤسس فيسبوك؟", o: ["مارك زوكربيرج", "بيل غيتس", "إيلون ماسك"], a: "مارك زوكربيرج" }
+    { q: "مين مؤسس فيسبوك؟", o: ["مارك زوكربيرج", "بيل غيتس", "إيلون ماسك", "ستيف جوبز"], a: "مارك زوكربيرج" },
+    { q: "أكبر دولة في العالم مساحة؟", o: ["روسيا", "كندا", "الصين", "أمريكا"], a: "روسيا" },
+    { q: "ما لون السماء في يوم صافي؟", o: ["أزرق", "أخضر", "أحمر", "أصفر"], a: "أزرق" }
 ];
 
 let currentQuestion = 0;
@@ -188,23 +164,31 @@ const questionEl = document.getElementById("question");
 const timerEl = document.getElementById("timer");
 const barEl = document.getElementById("bar");
 const confirmBtn = document.getElementById("confirmBtn");
+const resultEl = document.getElementById("result");
+const gameScreen = document.getElementById("gameScreen");
+
+const correctSound = new Audio("https://assets.mixkit.co/sfx/preview/2965/2965.wav");
+const wrongSound = new Audio("https://assets.mixkit.co/sfx/preview/2573/2573.wav");
 
 function loadQuestion() {
     if (currentQuestion >= questions.length) return endGame();
+
     const q = questions[currentQuestion];
     selectedAnswer = null;
 
-    let html = `<h2 style="margin:0 0 25px 0;">${q.q}</h2>`;
-    q.o.forEach(o => {
-        html += `<div class="option" onclick="selectOption(this)">${o}</div>`;
+    let html = `<h2 style="margin-bottom:25px; font-size:1.4rem;">${q.q}</h2>`;
+    
+    q.o.forEach(opt => {
+        html += `<div class="option" onclick="selectOption(this)">${opt}</div>`;
     });
+
     questionEl.innerHTML = html;
     startTimer();
 }
 
 window.selectOption = function(el) {
-    document.querySelectorAll(".option").forEach(o => o.style.borderColor = "transparent");
-    el.style.borderColor = "#67e8f9";
+    document.querySelectorAll('.option').forEach(o => o.style.borderColor = 'transparent');
+    el.style.borderColor = '#67e8f9';
     selectedAnswer = el.innerText;
 };
 
@@ -218,12 +202,16 @@ function startTimer() {
         timeLeft--;
         timerEl.textContent = timeLeft;
         barEl.style.width = (timeLeft * 5) + "%";
+        if (timeLeft <= 5) timerEl.style.color = "#f87171";
         if (timeLeft <= 0) nextQuestion();
     }, 1000);
 }
 
 confirmBtn.addEventListener("click", () => {
-    if (!selectedAnswer) return alert("اختر إجابة أولاً!");
+    if (!selectedAnswer) {
+        resultEl.innerHTML = `<span style="color:#fcd34d;">❗ اختر إجابة أولاً</span>`;
+        return;
+    }
     nextQuestion();
 });
 
@@ -234,32 +222,41 @@ function nextQuestion() {
 
     document.querySelectorAll(".option").forEach(opt => {
         if (opt.innerText === q.a) opt.classList.add("correct");
-        if (opt.innerText === selectedAnswer && !isCorrect) opt.classList.add("wrong");
+        else if (opt.innerText === selectedAnswer && !isCorrect) opt.classList.add("wrong");
     });
 
     if (isCorrect) {
         score++;
-        confetti({particleCount: 150, spread: 70});
+        correctSound.play();
+        confetti({ particleCount: 180, spread: 80, origin: { y: 0.6 } });
+    } else {
+        wrongSound.play();
     }
 
     setTimeout(() => {
         currentQuestion++;
         loadQuestion();
-    }, 1200);
+    }, 1350);
 }
 
 function endGame() {
+    clearInterval(timerInterval);
     const percent = Math.round((score / questions.length) * 100);
-    document.getElementById("gameScreen").innerHTML = `
-        <span class="monster-icon">🌧️🌙</span>
-        <h1>خلصت اللعبة!</h1>
-        <h2>${score} / ${questions.length}</h2>
-        <p>${percent}%</p>
-        <button onclick="location.reload()">العب مرة تانية</button>
+    let msg = percent === 100 ? "🌧️✨ أنت أسطورة المطر!" :
+              percent >= 80 ? "🌙🔥 أداء رائع يا بطل" :
+              percent >= 60 ? "👍 كويس جداً" : "💧 حاول تاني.. المطر بيغسل الأخطاء";
+
+    gameScreen.innerHTML = `
+        <span class="monster-icon">🌧️🌕</span>
+        <h1>انتهت اللعبة</h1>
+        <h2 style="font-size:2.8rem; margin:20px 0;">${score}/${questions.length}</h2>
+        <p style="font-size:1.7rem;">${percent}%</p>
+        <p style="margin:25px 0;">${msg}</p>
+        <button onclick="location.reload()">🔄 العب مرة أخرى</button>
     `;
 }
 
-loadQuestion(); // لو حابب نبدأ مباشرة بدون باسورد مؤقتاً
+// بدء اللعبة بعد إدخال الباسورد
 </script>
 </body>
 </html>
