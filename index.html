@@ -1,540 +1,1352 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌌 MONSTER QUIZ LEGEND</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --glow: #67e8f9;
-            --neon-pink: #f472b6;
-            --neon-purple: #c084fc;
-        }
-        
-        * { box-sizing: border-box; margin:0; padding:0; }
-        
-        body {
-            font-family: 'Cairo', sans-serif;
-            color: white;
-            min-height: 100dvh;
-            overflow-x: hidden;
-            background: #000;
-            position: relative;
-            -webkit-text-size-adjust: 100%;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🌌 MONSTER QUIZ LEGEND 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cyan: #00f5ff;
+  --pink: #ff006e;
+  --purple: #8b00ff;
+  --gold: #ffd700;
+  --green: #00ff88;
+  --red: #ff3333;
+  --bg: #03010a;
+  --card-bg: rgba(5, 2, 20, 0.82);
+  --border: rgba(0,245,255,0.35);
+  --glow-cyan: 0 0 40px rgba(0,245,255,0.6);
+  --glow-pink: 0 0 40px rgba(255,0,110,0.6);
+  --glow-gold: 0 0 40px rgba(255,215,0,0.6);
+}
 
-        /* خلفية فيديو شفافة */
-        #video-container {
-            position: fixed;
-            inset: 0;
-            z-index: -10;
-            overflow: hidden;
-        }
-        #video-container video {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 2.5s ease;
-        }
-        #video-container video.active {
-            opacity: 0.75;
-        }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
-        #image-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: -9;
-            background-size: cover;
-            background-position: center;
-            opacity: 0.18;
-            transition: opacity 3s;
-            mix-blend-mode: screen;
-        }
+body{
+  font-family:'Cairo',sans-serif;
+  background:var(--bg);
+  color:#fff;
+  min-height:100dvh;
+  overflow-x:hidden;
+  position:relative;
+}
 
-        /* Glassmorphism Card */
-        .card, .password-card {
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(30px);
-            border: 2px solid rgba(103, 232, 249, 0.4);
-            box-shadow: 0 0 80px rgba(103, 232, 249, 0.5);
-        }
+/* ===== ANIMATED BACKGROUND ===== */
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
 
-        #password-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.92);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
+.bg-layer{
+  position:fixed;inset:0;z-index:1;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(139,0,255,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 80%, rgba(0,245,255,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255,0,110,0.07) 0%, transparent 70%);
+  animation:bgPulse 8s ease-in-out infinite alternate;
+}
+@keyframes bgPulse{
+  0%{opacity:0.7}100%{opacity:1}
+}
 
-        .password-card {
-            padding: 45px 30px;
-            border-radius: 28px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
+/* Grid lines */
+.grid-overlay{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
+  background-size:60px 60px;
+}
 
-        .card {
-            position: relative;
-            z-index: 10;
-            border-radius: 28px;
-            width: min(94%, 480px);
-            margin: 15px auto;
-            padding: 28px 20px;
-        }
+/* ===== SCREENS ===== */
+.screen{
+  position:fixed;inset:0;z-index:50;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  transition:opacity 0.6s ease, transform 0.6s ease;
+}
+.screen.hidden{opacity:0;pointer-events:none;transform:scale(0.96)}
 
-        @media (max-width: 600px) {
-            .card {
-                padding: 20px 14px;
-                margin: 10px auto;
-                border-radius: 20px;
-            }
-            .password-card {
-                padding: 30px 18px;
-            }
-            h1 { font-size: 1.8rem !important; }
-            #question { font-size: 1.1rem !important; min-height: 70px !important; }
-            .option {
-                padding: 14px 12px;
-                font-size: 1.05rem;
-                margin: 8px 0;
-                border-radius: 16px;
-            }
-        }
+/* ===== CARD ===== */
+.card{
+  background:var(--card-bg);
+  backdrop-filter:blur(40px) saturate(180%);
+  border:1.5px solid var(--border);
+  border-radius:28px;
+  box-shadow:
+    var(--glow-cyan),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  width:100%;
+  max-width:520px;
+  padding:32px 24px;
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg, transparent, var(--cyan), var(--purple), var(--pink), transparent);
+  animation:scanLine 3s linear infinite;
+}
+@keyframes scanLine{0%{opacity:0.4}50%{opacity:1}100%{opacity:0.4}}
 
-        h1 {
-            font-size: 2.6rem;
-            font-weight: 900;
-            background: linear-gradient(90deg, #67e8f9, #c084fc, #f472b6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+/* ===== PASSWORD SCREEN ===== */
+#pass-screen .card{max-width:420px;text-align:center}
 
-        .option {
-            background: rgba(30, 41, 59, 0.85);
-            padding: 18px;
-            margin: 10px 0;
-            border-radius: 18px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.35s ease;
-            border: 2px solid transparent;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-        }
-        .option:hover {
-            transform: translateY(-4px) scale(1.03);
-            box-shadow: 0 0 25px var(--glow);
-        }
-        .option.correct { background: #22c55e !important; border-color: #86efac; }
-        .option.wrong { background: #ef4444 !important; border-color: #f87171; }
+.logo-title{
+  font-size:2.4rem;font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:none;
+  line-height:1.2;margin-bottom:8px;
+}
+.logo-sub{
+  font-size:0.85rem;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(0,245,255,0.5);margin-bottom:30px;font-weight:600;
+}
 
-        #timer {
-            font-size: 1.65rem;
-            font-weight: 900;
-            color: #f59e0b;
-        }
+.pass-input-wrap{position:relative;margin:20px 0}
+.pass-input-wrap input{
+  width:100%;padding:18px 50px 18px 20px;
+  background:rgba(0,245,255,0.06);
+  border:1.5px solid rgba(0,245,255,0.25);
+  border-radius:16px;color:#fff;
+  font-size:1.5rem;letter-spacing:6px;text-align:center;
+  font-family:'Cairo',sans-serif;
+  transition:all 0.3s;outline:none;
+}
+.pass-input-wrap input:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 20px rgba(0,245,255,0.3);
+  background:rgba(0,245,255,0.1);
+}
+.pass-input-wrap input::placeholder{letter-spacing:2px;font-size:1.2rem;color:rgba(255,255,255,0.2)}
 
-        .progress {
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 9999px;
-            overflow: hidden;
-        }
-        #progress {
-            height: 100%;
-            background: linear-gradient(90deg, #67e8f9, #c084fc, #f472b6);
-            width: 0%;
-            transition: width 0.6s ease;
-        }
+.attempts-bar{
+  display:flex;gap:10px;justify-content:center;margin:16px 0;
+}
+.heart-attempt{font-size:1.6rem;transition:all 0.3s}
+.heart-attempt.lost{filter:grayscale(1);opacity:0.3;transform:scale(0.8)}
 
-        button#main-btn, button {
-            background: linear-gradient(45deg, #22c55e, #a78bfa);
-            border: none;
-            border-radius: 9999px;
-            font-weight: 900;
-            padding: 18px;
-            font-size: 1.4rem;
-            width: 100%;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0 0 30px rgba(103,232,249,0.6);
-        }
+.error-msg{
+  color:var(--red);font-size:1rem;font-weight:700;
+  min-height:28px;margin:8px 0;
+  animation:shake 0.4s ease;
+}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-8px)}75%{transform:translateX(8px)}
+}
 
-        .confetti {
-            position: fixed;
-            font-size: 2rem;
-            pointer-events: none;
-            z-index: 9999;
-            animation: confetti-fall 4s linear forwards;
-        }
+/* ===== BUTTONS ===== */
+.btn{
+  display:block;width:100%;padding:18px;
+  border:none;border-radius:16px;
+  font-family:'Cairo',sans-serif;font-size:1.2rem;font-weight:900;
+  cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden;
+}
+.btn-primary{
+  background:linear-gradient(135deg, var(--purple), var(--cyan));
+  color:#fff;box-shadow:var(--glow-cyan);
+}
+.btn-primary:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 0 60px rgba(0,245,255,0.7)}
+.btn-primary:active{transform:scale(0.98)}
 
-        @keyframes confetti-fall {
-            to {
-                transform: translateY(110vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-    </style>
+.btn-secondary{
+  background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.15);
+  color:rgba(255,255,255,0.7);font-size:1rem;padding:12px;margin-top:10px;
+}
+.btn-secondary:hover{background:rgba(255,255,255,0.12);color:#fff}
+
+.btn-danger{background:linear-gradient(135deg, #ff3333, #ff006e);box-shadow:var(--glow-pink)}
+.btn-gold{background:linear-gradient(135deg, #ff8c00, var(--gold));color:#000;box-shadow:var(--glow-gold)}
+
+/* ===== QUIZ SCREEN ===== */
+#quiz-screen{position:relative;z-index:10;display:flex;align-items:flex-start;justify-content:center;padding:16px}
+#quiz-screen .card{margin:0 auto}
+
+/* TOP BAR */
+.top-bar{
+  display:grid;grid-template-columns:1fr auto 1fr;
+  align-items:center;gap:10px;margin-bottom:18px;
+}
+.stat-badge{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px;padding:8px 14px;text-align:center;
+}
+.stat-label{font-size:0.65rem;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+.stat-value{font-size:1.1rem;font-weight:900}
+
+.hearts-display{display:flex;gap:4px;justify-content:center;font-size:1.5rem}
+.heart{transition:all 0.3s;display:inline-block}
+.heart.lost{filter:grayscale(1);opacity:0.25;transform:scale(0.75)}
+
+/* PROGRESS */
+.progress-wrap{margin-bottom:20px}
+.progress-info{display:flex;justify-content:space-between;font-size:0.8rem;color:rgba(255,255,255,0.45);margin-bottom:8px}
+.progress-bar{height:6px;background:rgba(255,255,255,0.08);border-radius:9999px;overflow:hidden}
+.progress-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg, var(--purple), var(--cyan), var(--pink));
+  border-radius:9999px;
+  transition:width 0.6s cubic-bezier(0.4,0,0.2,1);
+  box-shadow:0 0 12px var(--cyan);
+}
+
+/* TIMER */
+.timer-ring{position:relative;width:64px;height:64px;margin:0 auto 16px}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:4}
+.timer-ring .bg-ring{stroke:rgba(255,255,255,0.08)}
+.timer-ring .fg-ring{
+  stroke:var(--cyan);
+  stroke-dasharray:175;stroke-dashoffset:0;
+  transition:stroke-dashoffset 1s linear, stroke 0.3s;
+  filter:drop-shadow(0 0 6px var(--cyan));
+}
+.timer-number{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;font-weight:900;color:var(--gold);
+}
+
+/* QUESTION */
+.question-card{
+  background:rgba(0,245,255,0.04);
+  border:1px solid rgba(0,245,255,0.12);
+  border-radius:18px;padding:20px;margin-bottom:20px;
+  min-height:80px;line-height:1.6;font-size:1.1rem;font-weight:600;
+}
+.q-number{
+  font-size:0.75rem;color:var(--cyan);letter-spacing:3px;
+  text-transform:uppercase;margin-bottom:10px;font-weight:700;
+}
+
+/* OPTIONS */
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.option{
+  background:rgba(255,255,255,0.04);
+  border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:16px;padding:16px 20px;
+  font-size:1.1rem;font-weight:700;cursor:pointer;
+  transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+  display:flex;align-items:center;gap:12px;
+  font-family:'Cairo',sans-serif;
+}
+.option:hover:not(.disabled){
+  background:rgba(0,245,255,0.1);
+  border-color:rgba(0,245,255,0.4);
+  transform:translateY(-2px);
+  box-shadow:0 8px 30px rgba(0,245,255,0.2);
+}
+.option.disabled{pointer-events:none}
+.option .opt-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:rgba(255,255,255,0.08);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;font-weight:900;flex-shrink:0;
+  transition:all 0.25s;
+}
+.option.correct{
+  background:rgba(0,255,136,0.15)!important;
+  border-color:var(--green)!important;
+  box-shadow:0 0 30px rgba(0,255,136,0.3)!important;
+}
+.option.correct .opt-icon{background:var(--green);color:#000}
+.option.wrong{
+  background:rgba(255,51,51,0.15)!important;
+  border-color:var(--red)!important;
+  box-shadow:0 0 30px rgba(255,51,51,0.3)!important;
+}
+.option.wrong .opt-icon{background:var(--red);color:#fff}
+
+/* FEEDBACK TOAST */
+.feedback-toast{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-80px);
+  z-index:200;padding:14px 28px;border-radius:50px;
+  font-weight:900;font-size:1.1rem;font-family:'Cairo',sans-serif;
+  transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space:nowrap;pointer-events:none;
+}
+.feedback-toast.show{transform:translateX(-50%) translateY(0)}
+.feedback-toast.correct-toast{background:var(--green);color:#000;box-shadow:0 0 40px rgba(0,255,136,0.5)}
+.feedback-toast.wrong-toast{background:var(--red);color:#fff;box-shadow:0 0 40px rgba(255,51,51,0.5)}
+.feedback-toast.timeout-toast{background:var(--gold);color:#000;box-shadow:0 0 40px rgba(255,215,0,0.5)}
+
+/* STREAK POPUP */
+.streak-popup{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  z-index:300;font-size:3rem;font-weight:900;
+  animation:streakPop 1.5s ease forwards;
+  text-shadow:0 0 30px currentColor;
+  pointer-events:none;
+}
+@keyframes streakPop{
+  0%{transform:translate(-50%,-50%) scale(0);opacity:0}
+  20%{transform:translate(-50%,-50%) scale(1.4);opacity:1}
+  60%{transform:translate(-50%,-50%) scale(1);opacity:1}
+  100%{transform:translate(-50%,-60%) scale(0.8);opacity:0}
+}
+
+/* MINI CONTROLS */
+.mini-controls{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.mini-btn{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  border-radius:12px;padding:10px 16px;cursor:pointer;transition:all 0.2s;
+  font-size:1rem;color:rgba(255,255,255,0.6);
+}
+.mini-btn:hover{background:rgba(255,255,255,0.12);color:#fff;transform:scale(1.05)}
+.mini-btn.active{color:var(--cyan);border-color:rgba(0,245,255,0.4)}
+
+/* ===== END SCREEN ===== */
+#end-screen .card{text-align:center;max-width:480px}
+
+.trophy-display{font-size:5rem;margin-bottom:16px;animation:trophyBounce 1s ease}
+@keyframes trophyBounce{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.2) rotate(5deg)}
+}
+
+.final-score{
+  font-size:4rem;font-weight:900;
+  background:linear-gradient(135deg, var(--gold), var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;
+}
+.final-label{font-size:0.8rem;color:rgba(255,255,255,0.35);letter-spacing:3px;margin-bottom:20px;margin-top:4px}
+
+.stats-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  margin:24px 0;
+}
+.stat-box{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:14px;padding:14px 8px;
+}
+.stat-box-val{font-size:1.5rem;font-weight:900;color:var(--cyan)}
+.stat-box-lbl{font-size:0.7rem;color:rgba(255,255,255,0.4);margin-top:4px}
+
+.result-message{
+  font-size:1.2rem;font-weight:700;margin:16px 0;
+  padding:16px;background:rgba(255,215,0,0.08);
+  border:1px solid rgba(255,215,0,0.2);border-radius:16px;
+  color:var(--gold);
+}
+
+/* LEADERBOARD */
+#lb-screen .card{max-width:460px}
+.lb-title{font-size:1.6rem;font-weight:900;margin-bottom:20px;text-align:center}
+.lb-list{list-style:none}
+.lb-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-radius:14px;margin-bottom:8px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  transition:all 0.3s;
+}
+.lb-item:hover{background:rgba(0,245,255,0.08);border-color:rgba(0,245,255,0.2)}
+.lb-rank{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.9rem;flex-shrink:0}
+.lb-rank.r1{background:var(--gold);color:#000}
+.lb-rank.r2{background:#c0c0c0;color:#000}
+.lb-rank.r3{background:#cd7f32;color:#fff}
+.lb-rank.rn{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5)}
+.lb-name{flex:1;font-weight:700}
+.lb-score{font-weight:900;color:var(--cyan)}
+.lb-date{font-size:0.7rem;color:rgba(255,255,255,0.3)}
+
+/* REVIEW SCREEN */
+#review-screen .card{max-width:520px}
+.review-item{
+  padding:16px;border-radius:14px;margin-bottom:12px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.review-item.r-correct{background:rgba(0,255,136,0.06);border-color:rgba(0,255,136,0.2)}
+.review-item.r-wrong{background:rgba(255,51,51,0.06);border-color:rgba(255,51,51,0.2)}
+.review-q{font-size:0.95rem;font-weight:600;margin-bottom:8px;line-height:1.5}
+.review-ans{font-size:0.85rem;opacity:0.7}
+
+/* CONFETTI */
+.confetti-piece{
+  position:fixed;pointer-events:none;z-index:9999;
+  font-size:1.5rem;
+  animation:confettiRain linear forwards;
+}
+@keyframes confettiRain{
+  0%{transform:translateY(-50px) rotate(0deg);opacity:1}
+  100%{transform:translateY(110vh) rotate(720deg);opacity:0}
+}
+
+/* PARTICLES */
+.particle{
+  position:fixed;pointer-events:none;z-index:2;
+  width:3px;height:3px;border-radius:50%;
+  animation:floatParticle linear infinite;
+  opacity:0.4;
+}
+@keyframes floatParticle{
+  0%{transform:translateY(100vh) rotate(0deg);opacity:0}
+  10%{opacity:0.4}
+  90%{opacity:0.4}
+  100%{transform:translateY(-50px) rotate(360deg);opacity:0}
+}
+
+/* LEVEL UP OVERLAY */
+.levelup-overlay{
+  position:fixed;inset:0;z-index:400;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+  opacity:0;animation:levelUpShow 2s ease forwards;
+}
+@keyframes levelUpShow{
+  0%{opacity:0}20%{opacity:1}80%{opacity:1}100%{opacity:0}
+}
+.levelup-text{
+  font-size:3rem;font-weight:900;text-align:center;
+  background:linear-gradient(135deg, var(--gold), var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:levelUpBounce 0.5s ease;
+}
+@keyframes levelUpBounce{
+  0%{transform:scale(0)}50%{transform:scale(1.2)}100%{transform:scale(1)}
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,0.04)}
+::-webkit-scrollbar-thumb{background:rgba(0,245,255,0.3);border-radius:9999px}
+
+/* MOBILE */
+@media(max-width:480px){
+  .card{padding:20px 14px;border-radius:22px}
+  .logo-title{font-size:1.9rem}
+  .question-card{font-size:1rem;padding:16px}
+  .option{font-size:1rem;padding:14px 16px}
+  .stats-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+  .final-score{font-size:3rem}
+  .top-bar{gap:6px}
+  .stat-badge{padding:6px 10px}
+  .stat-value{font-size:1rem}
+}
+
+/* SCROLLABLE SCREENS */
+#review-screen, #lb-screen{
+  overflow-y:auto;align-items:flex-start;padding:20px 16px;
+}
+#review-screen .card, #lb-screen .card{margin:0 auto}
+
+/* NAME INPUT */
+.name-input{
+  width:100%;padding:14px 16px;
+  background:rgba(0,245,255,0.06);
+  border:1.5px solid rgba(0,245,255,0.25);
+  border-radius:14px;color:#fff;
+  font-size:1.1rem;text-align:center;
+  font-family:'Cairo',sans-serif;
+  outline:none;transition:all 0.3s;margin-bottom:12px;
+}
+.name-input:focus{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,245,255,0.25)}
+
+/* BADGE */
+.score-badge{
+  display:inline-block;padding:4px 14px;border-radius:50px;
+  font-size:0.75rem;font-weight:700;letter-spacing:2px;
+  margin-bottom:12px;
+}
+
+/* SCORE BONUS ANIM */
+.score-bonus{
+  position:fixed;z-index:300;font-size:1.4rem;font-weight:900;
+  color:var(--gold);text-shadow:0 0 20px var(--gold);
+  pointer-events:none;animation:bonusFly 1.2s ease forwards;
+}
+@keyframes bonusFly{
+  0%{opacity:1;transform:translateY(0)}
+  100%{opacity:0;transform:translateY(-60px)}
+}
+
+/* LOADING SCREEN */
+#loading-screen{
+  position:fixed;inset:0;z-index:500;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+}
+.loader-ring{
+  width:80px;height:80px;
+  border:4px solid rgba(0,245,255,0.1);
+  border-top-color:var(--cyan);
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+  box-shadow:0 0 30px rgba(0,245,255,0.4);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader-text{color:rgba(255,255,255,0.4);letter-spacing:3px;font-size:0.8rem}
+
+.divider{height:1px;background:linear-gradient(90deg,transparent,rgba(0,245,255,0.2),transparent);margin:20px 0}
+
+/* NAVBAR in quiz */
+.quiz-nav{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:16px;
+}
+.nav-score{
+  font-size:1.3rem;font-weight:900;
+  color:var(--gold);
+  text-shadow:0 0 20px rgba(255,215,0,0.5);
+}
+</style>
 </head>
 <body>
 
-    <div id="video-container"></div>
-    <div id="image-overlay"></div>
+<canvas id="bg-canvas"></canvas>
+<div class="bg-layer"></div>
+<div class="grid-overlay"></div>
 
-    <!-- Password Screen -->
-    <div id="password-screen">
-        <div class="password-card">
-            <h1>🌌 MONSTER QUIZ LEGEND</h1>
-            <p style="font-size:1.35rem; margin:25px 0 20px;">أدخل كملة السر للدخول</p>
-            <input type="password" id="pass-input" placeholder="••••••" maxlength="6" style="font-size:1.6rem; padding:16px; border-radius:16px;">
-            <div style="color:#fbbf24; margin:18px 0; font-size:1.25rem;">المحاولات المتبقية: <strong id="attempts-count">3</strong></div>
-            <button onclick="checkPassword()" style="padding:18px;">دخول للحل الاختبار🔥</button>
-            <p id="error-msg" style="color:#ef4444; margin-top:20px; min-height:28px;"></p>
-        </div>
+<!-- FEEDBACK TOAST -->
+<div class="feedback-toast" id="feedback-toast"></div>
+
+<!-- LOADING -->
+<div id="loading-screen" class="screen">
+  <div class="loader-ring"></div>
+  <div class="loader-text">MONSTER QUIZ جاري التحميل...</div>
+</div>
+
+<!-- PASSWORD -->
+<div id="pass-screen" class="screen hidden">
+  <div class="card">
+    <div class="logo-title">🌌 MONSTER QUIZ<br>LEGEND 2026</div>
+    <div class="logo-sub">نسخة الأساطير المطورة</div>
+    <p style="color:rgba(255,255,255,0.55);font-size:0.95rem;margin-bottom:20px">أدخل كلمة السر للوصول للاختبار</p>
+
+    <div class="attempts-bar" id="attempts-bar">
+      <span class="heart-attempt" id="ha1">🔑</span>
+      <span class="heart-attempt" id="ha2">🔑</span>
+      <span class="heart-attempt" id="ha3">🔑</span>
     </div>
 
-    <!-- Quiz Card -->
-    <div class="card" id="quiz-card" style="display:none;">
-        <h1>🌌 MONSTER QUIZ LEGEND</h1>
-        
-        <div style="display:flex; justify-content:space-between; align-items:center; margin:15px 0; font-size:1.25rem;">
-            <div id="level" style="background:#eab308;color:#000;padding:6px 18px;border-radius:9999px;font-weight:900;">مستوى ١</div>
-            <div id="hearts" style="font-size:2.4rem;">❤️❤️❤️</div>
-            <div id="streak" style="background:#eab308;color:#000;padding:6px 18px;border-radius:9999px;font-weight:900;">🔥 0</div>
-        </div>
-
-        <div class="progress"><div id="progress"></div></div>
-
-        <p id="question" style="font-size:1.35rem; min-height:78px; margin:22px 0; font-weight:700; line-height:1.4;"></p>
-        
-        <div id="options"></div>
-        
-        <div id="timer" style="text-align:center; margin:15px 0; display:none;">
-            ⏳ <span id="time-left">15</span>
-        </div>
-
-        <button id="main-btn" onclick="startQuiz()">ابدأ التحدي الوحشي 🔥</button>
-        
-        <div style="margin-top:15px; display:flex; gap:10px; justify-content:center;">
-            <button onclick="toggleMusic()" style="padding:12px 20px; font-size:1rem; background:rgba(255,255,255,0.1);">🎵</button>
-            <button onclick="toggleFullscreen()" style="padding:12px 20px; font-size:1rem; background:rgba(255,255,255,0.1);">⛶</button>
-        </div>
+    <div class="pass-input-wrap">
+      <input type="password" id="pass-input" placeholder="••••••" maxlength="6"
+        onkeydown="if(event.key==='Enter')checkPassword()" autocomplete="off">
     </div>
 
-    <audio id="bgMusic" loop>
-        <source src="https://www.chosic.com/wp-content/uploads/2023/05/relaxing-piano-music-for-video.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="correctSound" src="https://freesound.org/data/previews/66/66930_931655-lq.mp3"></audio>
-    <audio id="wrongSound" src="https://freesound.org/data/previews/387/387186_7258993-lq.mp3"></audio>
+    <p class="error-msg" id="error-msg"></p>
+    <button class="btn btn-primary" onclick="checkPassword()">🚀 دخول للاختبار</button>
+  </div>
+</div>
+
+<!-- NAME ENTRY (after pass) -->
+<div id="name-screen" class="screen hidden">
+  <div class="card" style="text-align:center;max-width:400px">
+    <div style="font-size:3rem;margin-bottom:16px">👤</div>
+    <div style="font-size:1.5rem;font-weight:900;margin-bottom:8px">أهلاً أيها البطل!</div>
+    <p style="color:rgba(255,255,255,0.5);margin-bottom:24px;font-size:0.95rem">أدخل اسمك لتسجيل نتيجتك في قائمة الأوائل</p>
+    <input type="text" class="name-input" id="player-name" placeholder="اسمك هنا..." maxlength="20"
+      onkeydown="if(event.key==='Enter')startFromName()">
+    <button class="btn btn-primary" onclick="startFromName()">🔥 ابدأ التحدي الوحشي</button>
+    <button class="btn btn-secondary" onclick="startFromName(true)">تخطي →</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz-screen" class="screen hidden" style="position:fixed;overflow-y:auto;">
+  <div class="card">
+
+    <div class="quiz-nav">
+      <div class="stat-badge">
+        <div class="stat-label">المستوى</div>
+        <div class="stat-value" id="level-display">١</div>
+      </div>
+      <div class="hearts-display" id="hearts-display">
+        <span class="heart" id="h1">❤️</span>
+        <span class="heart" id="h2">❤️</span>
+        <span class="heart" id="h3">❤️</span>
+      </div>
+      <div class="stat-badge">
+        <div class="stat-label">سلسلة</div>
+        <div class="stat-value" id="streak-display">🔥 0</div>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="q-counter">سؤال 1 / 80</span>
+        <span id="score-display" style="color:var(--gold);font-weight:900">0 نقطة</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+
+    <div class="timer-ring" id="timer-ring">
+      <svg width="64" height="64" viewBox="0 0 64 64">
+        <circle class="bg-ring" cx="32" cy="32" r="28"/>
+        <circle class="fg-ring" id="timer-arc" cx="32" cy="32" r="28"/>
+      </svg>
+      <div class="timer-number" id="timer-num">15</div>
+    </div>
+
+    <div class="question-card">
+      <div class="q-number" id="q-number">سؤال ١</div>
+      <div id="question-text"></div>
+    </div>
+
+    <div class="options-grid" id="options-container"></div>
+
+    <div class="mini-controls">
+      <div class="mini-btn" id="music-btn" onclick="toggleMusic()">🎵 موسيقى</div>
+      <div class="mini-btn" onclick="toggleFullscreen()">⛶ ملء الشاشة</div>
+      <div class="mini-btn" onclick="showLeaderboard()">🏆 الأوائل</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- END SCREEN -->
+<div id="end-screen" class="screen hidden" style="overflow-y:auto;align-items:flex-start;padding:20px 16px">
+  <div class="card" style="margin:0 auto">
+    <div class="trophy-display" id="end-trophy">🏆</div>
+    <div class="final-score" id="end-score">0</div>
+    <div class="final-label">النقاط الإجمالية</div>
+    <div class="score-badge" id="grade-badge" style="background:rgba(255,215,0,0.15);color:var(--gold);border:1px solid rgba(255,215,0,0.3)">
+      ⭐ درجتك
+    </div>
+
+    <div class="result-message" id="result-msg">أحسنت!</div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-box-val" id="end-correct">0</div>
+        <div class="stat-box-lbl">✅ صح</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" id="end-wrong" style="color:var(--red)">0</div>
+        <div class="stat-box-lbl">❌ خطأ</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" id="end-pct" style="color:var(--gold)">0%</div>
+        <div class="stat-box-lbl">🎯 دقة</div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-box-val" id="end-streak" style="color:var(--pink)">0</div>
+        <div class="stat-box-lbl">🔥 أطول سلسلة</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" id="end-time" style="color:var(--purple)">0</div>
+        <div class="stat-box-lbl">⏱️ ثانية</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-val" id="end-bonus" style="color:var(--green)">0</div>
+        <div class="stat-box-lbl">⚡ بونص</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="btn btn-primary" onclick="restartQuiz()" style="margin-bottom:10px">🎮 العب مرة أخرى</button>
+    <button class="btn btn-gold" onclick="showReview()" style="margin-bottom:10px">📋 مراجعة إجاباتي</button>
+    <button class="btn btn-secondary" onclick="showLeaderboard()">🏆 قائمة الأوائل</button>
+    <button class="btn btn-secondary" onclick="shareResult()" style="margin-top:8px">📤 شارك نتيجتك</button>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="lb-screen" class="screen hidden">
+  <div class="card">
+    <div class="lb-title">🏆 قائمة الأوائل</div>
+    <ul class="lb-list" id="lb-list"></ul>
+    <div class="divider"></div>
+    <button class="btn btn-secondary" onclick="goBack()">← رجوع</button>
+    <button class="btn btn-danger" onclick="clearLeaderboard()" style="margin-top:10px;font-size:0.9rem;padding:12px">🗑️ مسح القائمة</button>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div id="review-screen" class="screen hidden">
+  <div class="card">
+    <div class="lb-title">📋 مراجعة الإجابات</div>
+    <div id="review-list"></div>
+    <div class="divider"></div>
+    <button class="btn btn-secondary" onclick="goBack()">← رجوع</button>
+  </div>
+</div>
+
+<!-- AUDIOS -->
+<audio id="bgMusic" loop preload="auto">
+  <source src="https://www.chosic.com/wp-content/uploads/2023/05/relaxing-piano-music-for-video.mp3" type="audio/mpeg">
+</audio>
+<audio id="sndCorrect" preload="auto">
+  <source src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" type="audio/mpeg">
+</audio>
+<audio id="sndWrong" preload="auto">
+  <source src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3" type="audio/mpeg">
+</audio>
+<audio id="sndLevelUp" preload="auto">
+  <source src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" type="audio/mpeg">
+</audio>
+<audio id="sndStreak" preload="auto">
+  <source src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3" type="audio/mpeg">
+</audio>
 
 <script>
-// ====================== المتغيرات والأسئلة ======================
-const questions = [
-    { q: "أسس فرويد أول مختبر لعلم النفس التجريبي سنة 1879؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "علم النفس الإكلينيكي يهدف إلى حل المشكلات النفسية وعلاج الاضطرابات؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من أهداف علم النفس الوصف والتفسير والتنبؤ؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "اهتم ديكارت بالعلاقة بين العقل والجسد في العصر الحديث؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من مناهج البحث في علم النفس المنهج التجريبي والمنهج الإكلينيكي؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من مناهج البحث في علم النفس التعلم الذاتي؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "علم النفس هو العلم الذي يدرس السلوك البشري والعمليات العقلية باستخدام منهج علمي لفهمها وتفسيرها والتحكم والتنبؤ بها؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "يهتم علم النفس بدراسة الأفعال الظاهرة مثل الكالم والحركة فقط؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "يهتم علم النفس بدراسة العمليات العقلية مثل العوامل البيولوجية والاجتماعية والبيئية؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من مكونات الانفعالات في علم النفس الجانب الفسيولوجي والجانب الشعوري؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من مكونات الانفعالات في علم النفس الجانب الفسيولوجي والجانب البيولوجي؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من أنواع الانفعالات الأساسية في علم النفس الفرح والحزن؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من أنواع الانفعالات الأساسية في علم النفس الدهشة والصداع؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من أنواع الانفعالات الأساسية في علم النفس التواصل الاجتماعي؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من مكونات ووظائف الدافعية الاستثارة والتوجيه؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من الدوافع الفطرية الأساسية تحقيق الذات والجوع والعطش؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من العوامل المؤثرة في الوراثة والبيئة؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "هل الذكاء يؤثر على العديد من السلوكيات البشرية؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "للذكاء أهمية في دراسة القدرات العقلية البشرية وتطورها؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "ليس للذكاء أهمية في دراسة القدرات العقلية البشرية وتطورها؟", options: ["صح", "خطأ"], answer: "خطأ" },
-
-    { q: "يتكون المخ (الدماغ) من فصوص، جبهي وجداري وصدغي؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من مراحل الذاكرة الترميز والتخزين والاسترجاع؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "الترتيب المنطقي لمراحل الذاكرة الاسترجاع ثم التخزين ثم الترميز؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من أنواع الذاكرة الرئيسية الذاكرة الحسية والذاكرة قصيرة المدى والذاكرة طويلة المدى؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من أنواع الذاكرة الرئيسية الذاكرة الحسية والذاكرة قصيرة المدى والذاكرة البيولوجية؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "ظهر ثنائي اللغة مرونة معرفية وقدرة أفضل على التبديل بين المهام؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "التعلم هو تغير شبه دائم في السلوك نتيجة الخبرة والممارسة ويتضمن تلقي وتخزين واستخدام المعلومات والمهارات؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من مراحل التعلم (الاستقبال والتخزين والاسترجاع)؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "الترتيب المنطقي لمراحل التعلم الاسترجاع ثم التخزين ثم الاستقبال؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من عمليات التعلم الأساسية الملاحظة والتصنيف والقياس والاستنتاج والتنبؤ؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من شروط وعوامل نجاح التعلم النضج والفهم والانتباه والتركيز؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من المبادئ الأساسية لنظرية ثورندايك في التعلم التعلم بالمحاولة والخطأ؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من أهم قوانين التعلم الرئيسية قانون الأثر وقانون الاستعداد؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من الانتقادات التي وجهت لنظرية ثورندايك في التعلم اعتبارها نظرية جزئية لأنها تجاهلت دور الفهم العميق والإدراك المعرفي لصالح الارتباطات السطحية؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من المراحل الرئيسية للنمو المعرفي مرحلة ما قبل العمليات (2 - 7 سنوات)؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "المرحلة الحسية الحركية للنمو المعرفي في نظرية بياجيه تتحدد من 2 : 7 سنوات؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من رواد النظرية السلوكية ثورانديك وبافلوف وسكينر؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "مبدأ النظريات المعرفية هو التركيز على العمليات العقلية الداخلية مثل الإدراك والانتباه والذاكرة؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من أبرز رواد النظريات المعرفية هو جان بياجيه؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "يعرف السلوك بأنه مجموع الاستجابات والأفعال الظاهرة أو المستترة للكائن الحي وهو قابل للملاحظة والقياس ويشمل التفاعل مع البيئة؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "يدرس علم النفس السلوك الإنساني لفهم دوافعه وآلياته وعواقبه؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "يركز تعزيز السلوك الإيجابي على الثناء والمكافآت؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من المبادئ الأساسية لنظرية سكينر في تعزيز السلوك هو التعزيز والعقاب والتعزيز التفاضلي؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "الترتيب المنطقي لخطوات تعديل السلوك عند سكينر تصميم خطة ثم التنفيذ والتقويم ثم تحديد السلوك المستهدف؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من الانتقادات التي وجهت لنظرية سكينر لتعديل السلوك تجاهل العوامل الداخلية مثل التفكير والعواطف والدوافع؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من تطبيقات نظرية سكينر في تعديل السلوك في الإدارة هو تحفيز الموظفين عبر أنظمة المكافآت والحوافز لتحسين الإنتاجية؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "تركز نظرية التحليل النفسي لفرويد على تطور الشخصية عبر ثماني مراحل؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "نظرية إريك إريكسون ترى أننا نبني بناءات ثنائية القطب مثل سعيد / حزين؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "يعتبر الذات هو النواة الأساسية للشخصية؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "يتحقق تكامل الشخصية عندما ينسجم مفهوم الذات الداخلية مع السلوك الظاهر والتكيف مع الآخرين؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من خطوات بناء الشخصية القوية تنمية الذات والتواصل الفعال والتحكم الذاتي والمسئولية الأخلاقية؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "تكامل الشخصية هو التناسق بين جوانبها المختلفة عقل ونفس وجسد وروح؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "مفهوم الذات يشمل الذات الواقعية كيف يرى الإنسان نفسه والذات المثالية كيف يتمنى أن تكون؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من تطبيقات نظرية سكينر في تعديل السلوك في التعلم استخدام المكافآت لتعزيز مشاركة الطالب أو إتقانهم للمهارات؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "أسس أول مختبر لعلم النفس التجريبي سنة 1879؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من أوائل الفالسفة المسلمون الذين اهتموا بعلم النفس؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من أهم مدارس علم النفس المدرسة البنائية؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "أسس المدرسة البنائية سيجموند فرويد؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "أسس المدرسة الوظيفية ويليام جيمس؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "أسس المدرسة السلوكية سكينر؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "أسس مدرسة التحليل النفسي سيجموند فرويد؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "أسس المدرسة الجشطالت ماكس فيرتهايمر؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من الدوافع الفطرية المكتسبة الجوع؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من أنواع الانفعالات الأساسية الفرح والخوف والغضب؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من المكونات الأساسية في الذكاء المنطق والتخطيط وسرعة التعلم؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من العوامل المؤثرة في الذكاء الوراثة والبيئة والظروف الاجتماعية؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "لِلغة أهمية في التفكير منها تشكيل الأفكار والترميز والتعميم؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من أنواع الذاكرة الرئيسية الذاكرة الحسية والذاكرة قصيرة المدى والذاكرة طويلة المدى？", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من عمليات التعلم الأساسية الملاحظة؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من عمليات التعلم الأساسية الملاحظة والتصنيف والقياس؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من شروط وعوامل نجاح التعلم النضج والفهم والانتباه والتركيز؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "مرحلة العمليات الملموسة في نظرية بياجيه تتحدد من عمر 2 : 7 سنوات؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "مرحلة العمليات الحسية الحركية في نظرية بياجيه تتحدد من عمر من الوالدة حتى سن سنتين؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من المراحل الرئيسية المهمة للنمو المعرفي الحسية الحركية وما قبل العمليات والعمليات الملموسة؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من رواد النظرية السلوكية ثورانديك؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من أهم نظريات التعلم في علم النفس النظرية السلوكية؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من مكونات السلوك الأساسية الجانب المعرفي والجانب الحركي والجانب الانفعالي؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "السلوك هو الاستجابات والأفعال الظاهرة فقط؟", options: ["صح", "خطأ"], answer: "خطأ" },
-    { q: "من خطوات تعديل السلوك عند سكينر تصميم الخطة؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "من خطوات بناء الشخصية القوية التواصل الفعال؟", options: ["صح", "خطأ"], answer: "صح" },
-    { q: "هناك عوامل تساعد على بناء الهوية الشخصية منها عوامل ثقافية واجتماعية؟", options: ["صح", "خطأ"], answer: "صح" }
+// ============================================================
+// DATA
+// ============================================================
+const QUESTIONS_RAW = [
+  { q:"أسس فرويد أول مختبر لعلم النفس التجريبي سنة 1879؟", a:"خطأ" },
+  { q:"علم النفس الإكلينيكي يهدف إلى حل المشكلات النفسية وعلاج الاضطرابات؟", a:"صح" },
+  { q:"من أهداف علم النفس الوصف والتفسير والتنبؤ؟", a:"صح" },
+  { q:"اهتم ديكارت بالعلاقة بين العقل والجسد في العصر الحديث؟", a:"صح" },
+  { q:"من مناهج البحث في علم النفس المنهج التجريبي والمنهج الإكلينيكي؟", a:"صح" },
+  { q:"من مناهج البحث في علم النفس التعلم الذاتي؟", a:"خطأ" },
+  { q:"علم النفس هو العلم الذي يدرس السلوك البشري والعمليات العقلية باستخدام منهج علمي لفهمها وتفسيرها والتحكم والتنبؤ بها؟", a:"صح" },
+  { q:"يهتم علم النفس بدراسة الأفعال الظاهرة مثل الكلام والحركة فقط؟", a:"خطأ" },
+  { q:"يهتم علم النفس بدراسة العمليات العقلية مثل العوامل البيولوجية والاجتماعية والبيئية؟", a:"خطأ" },
+  { q:"من مكونات الانفعالات في علم النفس الجانب الفسيولوجي والجانب الشعوري؟", a:"صح" },
+  { q:"من مكونات الانفعالات في علم النفس الجانب الفسيولوجي والجانب البيولوجي؟", a:"خطأ" },
+  { q:"من أنواع الانفعالات الأساسية في علم النفس الفرح والحزن فقط؟", a:"خطأ" },
+  { q:"من أنواع الانفعالات الأساسية في علم النفس الدهشة والصداع؟", a:"خطأ" },
+  { q:"من أنواع الانفعالات الأساسية في علم النفس التواصل الاجتماعي؟", a:"خطأ" },
+  { q:"من مكونات ووظائف الدافعية الاستثارة والتوجيه؟", a:"صح" },
+  { q:"من الدوافع الفطرية الأساسية تحقيق الذات والجوع والعطش؟", a:"خطأ" },
+  { q:"من العوامل المؤثرة في الذكاء الوراثة والبيئة؟", a:"صح" },
+  { q:"هل الذكاء يؤثر على العديد من السلوكيات البشرية؟", a:"صح" },
+  { q:"للذكاء أهمية في دراسة القدرات العقلية البشرية وتطورها؟", a:"صح" },
+  { q:"ليس للذكاء أهمية في دراسة القدرات العقلية البشرية وتطورها؟", a:"خطأ" },
+  { q:"يتكون المخ (الدماغ) من فصوص جبهي وجداري وصدغي؟", a:"صح" },
+  { q:"من مراحل الذاكرة الترميز والتخزين والاسترجاع؟", a:"صح" },
+  { q:"الترتيب المنطقي لمراحل الذاكرة الاسترجاع ثم التخزين ثم الترميز؟", a:"خطأ" },
+  { q:"من أنواع الذاكرة الرئيسية الذاكرة الحسية والذاكرة قصيرة المدى والذاكرة طويلة المدى؟", a:"صح" },
+  { q:"من أنواع الذاكرة الرئيسية الذاكرة الحسية والذاكرة قصيرة المدى والذاكرة البيولوجية؟", a:"خطأ" },
+  { q:"ظهر ثنائيو اللغة مرونة معرفية وقدرة أفضل على التبديل بين المهام؟", a:"صح" },
+  { q:"التعلم هو تغير شبه دائم في السلوك نتيجة الخبرة والممارسة ويتضمن تلقي وتخزين واستخدام المعلومات والمهارات؟", a:"صح" },
+  { q:"من مراحل التعلم الاستقبال والتخزين والاسترجاع؟", a:"صح" },
+  { q:"الترتيب المنطقي لمراحل التعلم الاسترجاع ثم التخزين ثم الاستقبال؟", a:"خطأ" },
+  { q:"من عمليات التعلم الأساسية الملاحظة والتصنيف والقياس والاستنتاج والتنبؤ؟", a:"صح" },
+  { q:"من شروط وعوامل نجاح التعلم النضج والفهم والانتباه والتركيز؟", a:"صح" },
+  { q:"من المبادئ الأساسية لنظرية ثورندايك في التعلم التعلم بالمحاولة والخطأ؟", a:"صح" },
+  { q:"من أهم قوانين التعلم الرئيسية قانون الأثر وقانون الاستعداد؟", a:"صح" },
+  { q:"من الانتقادات التي وجهت لنظرية ثورندايك اعتبارها نظرية جزئية لأنها تجاهلت دور الفهم العميق والإدراك المعرفي؟", a:"صح" },
+  { q:"من المراحل الرئيسية للنمو المعرفي مرحلة ما قبل العمليات من 2 إلى 7 سنوات؟", a:"صح" },
+  { q:"المرحلة الحسية الحركية للنمو المعرفي في نظرية بياجيه تتحدد من 2 إلى 7 سنوات؟", a:"خطأ" },
+  { q:"من رواد النظرية السلوكية ثورندايك وبافلوف وسكينر؟", a:"صح" },
+  { q:"مبدأ النظريات المعرفية هو التركيز على العمليات العقلية الداخلية مثل الإدراك والانتباه والذاكرة؟", a:"صح" },
+  { q:"من أبرز رواد النظريات المعرفية هو جان بياجيه؟", a:"صح" },
+  { q:"يعرف السلوك بأنه مجموع الاستجابات والأفعال الظاهرة أو المستترة للكائن الحي وهو قابل للملاحظة والقياس؟", a:"صح" },
+  { q:"يدرس علم النفس السلوك الإنساني لفهم دوافعه وآلياته وعواقبه؟", a:"صح" },
+  { q:"يركز تعزيز السلوك الإيجابي على الثناء والمكافآت؟", a:"صح" },
+  { q:"من المبادئ الأساسية لنظرية سكينر في تعزيز السلوك التعزيز والعقاب والتعزيز التفاضلي؟", a:"صح" },
+  { q:"الترتيب المنطقي لخطوات تعديل السلوك عند سكينر تصميم خطة ثم التنفيذ والتقويم ثم تحديد السلوك المستهدف؟", a:"خطأ" },
+  { q:"من الانتقادات التي وجهت لنظرية سكينر تجاهل العوامل الداخلية مثل التفكير والعواطف والدوافع؟", a:"صح" },
+  { q:"من تطبيقات نظرية سكينر في الإدارة تحفيز الموظفين عبر أنظمة المكافآت والحوافز لتحسين الإنتاجية؟", a:"صح" },
+  { q:"تركز نظرية التحليل النفسي لفرويد على تطور الشخصية عبر ثماني مراحل؟", a:"خطأ" },
+  { q:"نظرية إريك إريكسون ترى أننا نبني بناءات ثنائية القطب مثل سعيد/حزين؟", a:"خطأ" },
+  { q:"يعتبر الذات هو النواة الأساسية للشخصية؟", a:"صح" },
+  { q:"يتحقق تكامل الشخصية عندما ينسجم مفهوم الذات الداخلية مع السلوك الظاهر والتكيف مع الآخرين؟", a:"صح" },
+  { q:"من خطوات بناء الشخصية القوية تنمية الذات والتواصل الفعال والتحكم الذاتي والمسئولية الأخلاقية؟", a:"صح" },
+  { q:"تكامل الشخصية هو التناسق بين جوانبها المختلفة عقل ونفس وجسد وروح؟", a:"صح" },
+  { q:"مفهوم الذات يشمل الذات الواقعية كيف يرى الإنسان نفسه والذات المثالية كيف يتمنى أن تكون؟", a:"صح" },
+  { q:"من تطبيقات نظرية سكينر في التعليم استخدام المكافآت لتعزيز مشاركة الطالب وإتقانه للمهارات؟", a:"صح" },
+  { q:"من أوائل الفلاسفة المسلمين الذين اهتموا بعلم النفس ابن سينا وابن رشد؟", a:"صح" },
+  { q:"من أهم مدارس علم النفس المدرسة البنائية؟", a:"صح" },
+  { q:"أسس المدرسة البنائية سيجموند فرويد؟", a:"خطأ" },
+  { q:"أسس المدرسة الوظيفية ويليام جيمس؟", a:"صح" },
+  { q:"أسس المدرسة السلوكية جون واتسون وسكينر؟", a:"صح" },
+  { q:"أسس مدرسة التحليل النفسي سيجموند فرويد؟", a:"صح" },
+  { q:"أسس المدرسة الجشطالت ماكس فيرتهايمر؟", a:"صح" },
+  { q:"من الدوافع الفطرية المكتسبة الجوع؟", a:"خطأ" },
+  { q:"من أنواع الانفعالات الأساسية الفرح والخوف والغضب؟", a:"صح" },
+  { q:"من المكونات الأساسية في الذكاء المنطق والتخطيط وسرعة التعلم؟", a:"صح" },
+  { q:"من العوامل المؤثرة في الذكاء الوراثة والبيئة والظروف الاجتماعية؟", a:"صح" },
+  { q:"للغة أهمية في التفكير منها تشكيل الأفكار والترميز والتعميم؟", a:"صح" },
+  { q:"من عمليات التعلم الأساسية الملاحظة؟", a:"صح" },
+  { q:"من عمليات التعلم الأساسية الملاحظة والتصنيف والقياس؟", a:"صح" },
+  { q:"مرحلة العمليات الملموسة في نظرية بياجيه تتحدد من عمر 2 إلى 7 سنوات؟", a:"خطأ" },
+  { q:"مرحلة العمليات الحسية الحركية في نظرية بياجيه تتحدد من الولادة حتى سن سنتين؟", a:"صح" },
+  { q:"من المراحل الرئيسية للنمو المعرفي الحسية الحركية وما قبل العمليات والعمليات الملموسة؟", a:"صح" },
+  { q:"من رواد النظرية السلوكية ثورندايك؟", a:"صح" },
+  { q:"من أهم نظريات التعلم في علم النفس النظرية السلوكية؟", a:"صح" },
+  { q:"من مكونات السلوك الأساسية الجانب المعرفي والجانب الحركي والجانب الانفعالي؟", a:"صح" },
+  { q:"السلوك هو الاستجابات والأفعال الظاهرة فقط؟", a:"خطأ" },
+  { q:"من خطوات تعديل السلوك عند سكينر تصميم الخطة؟", a:"صح" },
+  { q:"من خطوات بناء الشخصية القوية التواصل الفعال؟", a:"صح" },
+  { q:"هناك عوامل تساعد على بناء الهوية الشخصية منها عوامل ثقافية واجتماعية؟", a:"صح" },
+  { q:"أسس ويلهلم وونت أول مختبر لعلم النفس التجريبي سنة 1879؟", a:"صح" },
+  { q:"من فروع علم النفس علم النفس الاجتماعي وعلم النفس التربوي؟", a:"صح" },
+  { q:"يعمل علم النفس الصناعي على تحسين بيئة العمل وزيادة الإنتاجية؟", a:"صح" }
 ];
 
-let currentQuestion = 0, score = 0, lives = 3, streak = 0, timerInterval = null;
-const totalQuestions = questions.length;
-let passwordAttempts = 3;
-const correctPassword = "258147";
+// ============================================================
+// STATE
+// ============================================================
+const PASSWORD = "258147";
+let questions = [];
+let current = 0, score = 0, lives = 3, streak = 0, maxStreak = 0;
+let timerInterval = null, timeLeft = 15;
+let passAttempts = 3;
+let musicOn = false;
+let playerName = "بطل";
+let startTime = 0, totalTime = 0;
+let correctCount = 0, wrongCount = 0;
+let bonusTotal = 0;
+let userAnswers = [];
+let prevLevel = 0;
+let prevScreen = null;
 
-const backgrounds = [
-    "https://videos.pexels.com/video-files/1851190/1851190-hd_1920_1080_30fps.mp4",
-    "https://videos.pexels.com/video-files/854/854-hd_1920_1080_30fps.mp4",
-    "https://videos.pexels.com/video-files/319/319-hd_1920_1080_30fps.mp4"
-];
+const TIMER_MAX = 175;
 
-function initBackgrounds() {
-    const container = document.getElementById('video-container');
-    backgrounds.forEach((src, i) => {
-        const v = document.createElement('video');
-        v.src = src;
-        v.loop = true;
-        v.muted = true;
-        v.playsInline = true;
-        if (i === 0) v.classList.add('active');
-        container.appendChild(v);
-        v.load();
-    });
+// ============================================================
+// LEADERBOARD (localStorage)
+// ============================================================
+function getLeaderboard() {
+  try { return JSON.parse(localStorage.getItem('mq_lb') || '[]'); } catch { return []; }
+}
+function saveLeaderboard(lb) {
+  try { localStorage.setItem('mq_lb', JSON.stringify(lb)); } catch {}
+}
+function addToLeaderboard(entry) {
+  const lb = getLeaderboard();
+  lb.push(entry);
+  lb.sort((a,b)=>b.score-a.score);
+  saveLeaderboard(lb.slice(0,20));
+}
+function clearLeaderboard() {
+  if(confirm('هل أنت متأكد من مسح قائمة الأوائل؟')) {
+    localStorage.removeItem('mq_lb');
+    renderLeaderboard();
+  }
 }
 
-function changeBackground() {
-    const videos = document.querySelectorAll('#video-container video');
-    videos.forEach(v => v.classList.remove('active'));
-    const next = (Array.from(videos).findIndex(v => v.classList.contains('active')) + 1) % videos.length || 0;
-    videos[next].classList.add('active');
+// ============================================================
+// UTILS
+// ============================================================
+function shuffle(arr) {
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function arabicNum(n) {
+  return String(n).replace(/\d/g, d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+}
+function getLevel(q) { return Math.floor(q/10)+1; }
+function getLevelName(l) {
+  const names=['مبتدئ','متحمس','جاد','مميز','وحش','أسطورة','عبقري','أمبراطور','خارق','LEGEND'];
+  return names[Math.min(l-1,9)];
 }
 
-function startMusic() {
-    document.getElementById('bgMusic').volume = 0.25;
-    document.getElementById('bgMusic').play().catch(()=>{});
+// ============================================================
+// SCREENS
+// ============================================================
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  const el = document.getElementById(id);
+  if(el) el.classList.remove('hidden');
 }
 
-function checkPassword() {
-    const input = document.getElementById('pass-input').value.trim();
-    const error = document.getElementById('error-msg');
-    const attemptsEl = document.getElementById('attempts-count');
-
-    if (input === correctPassword) {
-        document.getElementById('password-screen').style.opacity = '0';
-        setTimeout(() => {
-            document.getElementById('password-screen').style.display = 'none';
-            document.getElementById('quiz-card').style.display = 'block';
-            initBackgrounds();
-            startMusic();
-            setInterval(changeBackground, 18000);
-            startQuiz();
-        }, 800);
-    } else {
-        passwordAttempts--;
-        attemptsEl.textContent = passwordAttempts;
-        error.textContent = passwordAttempts > 0 ? `خطأ! ${passwordAttempts} محاولات متبقية` : '🚫 تم حظرك';
-    }
-}
-
-function startQuiz() {
-    currentQuestion = 0; score = 0; lives = 3; streak = 0;
-    document.getElementById('main-btn').style.display = 'none';
-    loadQuestion();
-}
-
-function loadQuestion() {
-    if (currentQuestion >= totalQuestions) return endQuiz();
-
-    const q = questions[currentQuestion];
-    document.getElementById('progress').style.width = `${((currentQuestion) / totalQuestions) * 100}%`;
-    document.getElementById('level').textContent = `مستوى ${Math.floor(currentQuestion / 5) + 1}`;
-    document.getElementById('hearts').innerHTML = '❤️'.repeat(lives);
-    document.getElementById('streak').innerHTML = `🔥 ${streak}`;
-
-    document.getElementById('question').innerHTML = `
-        <span style="font-size:0.95rem; opacity:0.8;">سؤال ${currentQuestion + 1}/${totalQuestions}</span><br>
-        ${q.q}
+// ============================================================
+// PARTICLES
+// ============================================================
+function initParticles() {
+  const colors = ['#00f5ff','#ff006e','#8b00ff','#ffd700','#00ff88'];
+  for(let i=0;i<25;i++) {
+    const p = document.createElement('div');
+    p.className='particle';
+    p.style.cssText=`
+      left:${Math.random()*100}vw;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${Math.random()*15+10}s;
+      animation-delay:${Math.random()*10}s;
+      width:${Math.random()*4+1}px;height:${Math.random()*4+1}px;
+      box-shadow:0 0 6px currentColor;
     `;
+    document.body.appendChild(p);
+  }
+}
 
-    let html = '';
-    q.options.forEach((opt, i) => {
-        html += `<div class="option" onclick="selectAnswer(this, '${opt}', '${q.answer}')">${String.fromCharCode(65 + i)}. ${opt}</div>`;
+// ============================================================
+// CANVAS BG
+// ============================================================
+function initCanvas() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let w,h,stars=[];
+
+  function resize() {
+    w=canvas.width=window.innerWidth;
+    h=canvas.height=window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize',resize);
+
+  for(let i=0;i<120;i++) {
+    stars.push({
+      x:Math.random()*2000,y:Math.random()*2000,
+      r:Math.random()*1.5+0.3,
+      vx:(Math.random()-0.5)*0.2,vy:(Math.random()-0.5)*0.2,
+      a:Math.random()
     });
-    document.getElementById('options').innerHTML = html;
+  }
 
-    startTimer();
+  function draw() {
+    ctx.clearRect(0,0,w,h);
+    stars.forEach(s=>{
+      s.x+=s.vx;s.y+=s.vy;
+      s.a+=0.008;
+      if(s.x<0)s.x=w;if(s.x>w)s.x=0;
+      if(s.y<0)s.y=h;if(s.y>h)s.y=0;
+      const alpha=0.3+0.4*Math.abs(Math.sin(s.a));
+      ctx.beginPath();
+      ctx.arc(s.x%w,s.y%h,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,245,255,${alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ============================================================
+// PASSWORD
+// ============================================================
+function checkPassword() {
+  const val = document.getElementById('pass-input').value.trim();
+  const err = document.getElementById('error-msg');
+  if(val === PASSWORD) {
+    show('name-screen');
+  } else {
+    passAttempts--;
+    const ha = document.getElementById(`ha${3-passAttempts}`);
+    if(ha) ha.classList.add('lost');
+    if(passAttempts <= 0) {
+      err.textContent = '🚫 تم حظرك! حاول لاحقاً';
+      document.querySelectorAll('.btn').forEach(b=>b.disabled=true);
+    } else {
+      err.textContent = `كلمة السر خاطئة! متبقي ${arabicNum(passAttempts)} محاولات`;
+      err.style.animation='none';
+      setTimeout(()=>err.style.animation='',50);
+    }
+  }
+  document.getElementById('pass-input').value='';
+  document.getElementById('pass-input').focus();
+}
+
+function startFromName(skip=false) {
+  const inp = document.getElementById('player-name').value.trim();
+  playerName = (skip || !inp) ? 'بطل مجهول' : inp;
+  initQuiz();
+}
+
+// ============================================================
+// QUIZ INIT
+// ============================================================
+function initQuiz() {
+  questions = shuffle(QUESTIONS_RAW);
+  current=0; score=0; lives=3; streak=0; maxStreak=0;
+  correctCount=0; wrongCount=0; bonusTotal=0; userAnswers=[];
+  startTime=Date.now(); prevLevel=0;
+  show('quiz-screen');
+  updateHearts();
+  loadQuestion();
+  tryPlayMusic();
+}
+
+function restartQuiz() {
+  stopTimer();
+  initQuiz();
+}
+
+// ============================================================
+// LOAD QUESTION
+// ============================================================
+function loadQuestion() {
+  if(current>=questions.length) return endQuiz();
+  if(lives<=0) return endQuiz();
+
+  const q = questions[current];
+  const lvl = getLevel(current);
+
+  // Level up check
+  if(lvl>prevLevel && prevLevel>0) showLevelUp(lvl);
+  prevLevel=lvl;
+
+  // Update UI
+  document.getElementById('level-display').textContent = `${arabicNum(lvl)} - ${getLevelName(lvl)}`;
+  document.getElementById('q-counter').textContent = `سؤال ${arabicNum(current+1)} / ${arabicNum(questions.length)}`;
+  document.getElementById('score-display').textContent = `${score} نقطة`;
+  document.getElementById('streak-display').textContent = `🔥 ${arabicNum(streak)}`;
+  document.getElementById('q-number').textContent = `سؤال ${arabicNum(current+1)}`;
+  document.getElementById('question-text').textContent = q.q;
+
+  // Progress
+  const pct = (current/questions.length)*100;
+  document.getElementById('progress-fill').style.width = pct+'%';
+
+  // Options (always shuffled صح/خطأ)
+  const opts = shuffle(['صح','خطأ']);
+  const container = document.getElementById('options-container');
+  container.innerHTML='';
+  opts.forEach((opt,i)=>{
+    const icons=['✅','❌'];
+    const div=document.createElement('div');
+    div.className='option';
+    div.innerHTML=`
+      <div class="opt-icon">${opt==='صح'?'✓':'✗'}</div>
+      <span>${opt}</span>
+    `;
+    div.onclick=()=>selectAnswer(div, opt, q.a, current);
+    container.appendChild(div);
+  });
+
+  startTimer();
+
+  // Scroll to top
+  const qs = document.getElementById('quiz-screen');
+  qs.scrollTop=0;
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+function startTimer() {
+  stopTimer();
+  timeLeft=15;
+  updateTimerUI();
+  timerInterval=setInterval(()=>{
+    timeLeft--;
+    updateTimerUI();
+    if(timeLeft<=0){stopTimer();handleTimeout();}
+  },1000);
 }
 
 function stopTimer() {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
+  clearInterval(timerInterval);
+  timerInterval=null;
+}
+
+function updateTimerUI() {
+  const num=document.getElementById('timer-num');
+  const arc=document.getElementById('timer-arc');
+  if(num) num.textContent=timeLeft;
+  if(arc) {
+    const offset=TIMER_MAX*(1-timeLeft/15);
+    arc.style.strokeDashoffset=offset;
+    arc.style.stroke=timeLeft>5?'var(--cyan)':timeLeft>3?'var(--gold)':'var(--red)';
+    arc.style.filter=`drop-shadow(0 0 6px ${timeLeft>5?'var(--cyan)':timeLeft>3?'var(--gold)':'var(--red)'})`;
+  }
+  if(num) num.style.color=timeLeft>5?'var(--gold)':timeLeft>3?'#ff8c00':'var(--red)';
+}
+
+function handleTimeout() {
+  lives--;
+  streak=0;
+  updateHearts();
+  const q=questions[current];
+  userAnswers.push({q:q.q,userAns:'انتهى الوقت',correct:q.a,ok:false});
+  wrongCount++;
+  document.querySelectorAll('.option').forEach(opt=>{
+    opt.classList.add('disabled');
+    if(opt.querySelector('span').textContent===q.a) opt.classList.add('correct');
+  });
+  showFeedback('timeout','⏰ انتهى الوقت!');
+  playSound('wrong');
+  if(lives<=0){
+    setTimeout(endQuiz,1500);
+    return;
+  }
+  setTimeout(()=>{current++;loadQuestion();},1600);
+}
+
+// ============================================================
+// SELECT ANSWER
+// ============================================================
+function selectAnswer(el, selected, correct, qIdx) {
+  if(el.classList.contains('disabled')) return;
+  stopTimer();
+
+  document.querySelectorAll('.option').forEach(o=>o.classList.add('disabled'));
+
+  const isCorrect = selected===correct;
+  userAnswers.push({q:questions[qIdx].q,userAns:selected,correct,ok:isCorrect});
+
+  if(isCorrect) {
+    el.classList.add('correct');
+    const bonus = streak>=5?30:streak>=3?20:streak>=2?15:10;
+    score+=bonus;
+    bonusTotal+=(bonus-10);
+    correctCount++;
+    streak++;
+    if(streak>maxStreak) maxStreak=streak;
+    document.getElementById('score-display').textContent=`${score} نقطة`;
+    document.getElementById('streak-display').textContent=`🔥 ${arabicNum(streak)}`;
+    showFeedback('correct', streak>=5?`🔥 سلسلة ${arabicNum(streak)}! +${bonus}`:streak>=3?`⚡ رائع! +${bonus}`:`✅ صح! +${bonus}`);
+    playSound('correct');
+    if(streak===3||streak===5||streak===10) {
+      showStreakPopup(streak);
+      playSound('streak');
     }
-}
-
-function startTimer() {
-    stopTimer();
-
-    let timeLeft = 15;
-    const timeSpan = document.getElementById('time-left');
-    const timerBox = document.getElementById('timer');
-
-    timerBox.style.display = 'block';
-    timeSpan.textContent = timeLeft;
-    timeSpan.style.color = '#f59e0b';
-
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        timeSpan.textContent = timeLeft;
-
-        if (timeLeft <= 5) {
-            timeSpan.style.color = '#ef4444';
-        }
-
-        if (timeLeft <= 0) {
-            stopTimer();
-            timeOut();
-        }
-    }, 1000);
-}
-
-function selectAnswer(element, selected, correct) {
-    stopTimer();
-    document.getElementById('timer').style.display = 'none';
-    document.querySelectorAll('.option').forEach(opt => opt.style.pointerEvents = 'none');
-
-    if (selected === correct) {
-        element.classList.add('correct');
-        score += 10 + (streak * 5);
-        streak++;
-        document.getElementById('correctSound').play().catch(()=>{});
-        createConfetti(60);
-    } else {
-        element.classList.add('wrong');
-        lives--;
-        streak = 0;
-        document.getElementById('wrongSound').play().catch(()=>{});
-        document.querySelectorAll('.option').forEach(opt => {
-            if (opt.textContent.includes(correct)) opt.classList.add('correct');
-        });
-    }
-
-    document.getElementById('hearts').innerHTML = '❤️'.repeat(lives);
-    document.getElementById('streak').innerHTML = `🔥 ${streak}`;
-
-    setTimeout(() => {
-        currentQuestion++;
-        loadQuestion();
-    }, 1550);
-}
-
-function timeOut() {
-    lives--;
-    streak = 0;
-    document.getElementById('hearts').innerHTML = '❤️'.repeat(lives);
-    document.getElementById('wrongSound').play().catch(()=>{});
-    
-    const q = questions[currentQuestion];
-    document.querySelectorAll('.option').forEach(opt => {
-        if (opt.textContent.includes(q.answer)) opt.classList.add('correct');
-        opt.style.pointerEvents = 'none';
+    createConfetti(streak>=5?80:40);
+    showScoreBonus(`+${bonus}`);
+  } else {
+    el.classList.add('wrong');
+    document.querySelectorAll('.option').forEach(o=>{
+      if(o.querySelector('span').textContent===correct) o.classList.add('correct');
     });
-
-    setTimeout(() => { currentQuestion++; loadQuestion(); }, 1400);
-}
-
-function createConfetti(count) {
-    const emojis = ['🌟','✨','🔥','💎','🦍','⚡'];
-    for (let i = 0; i < count; i++) {
-        const c = document.createElement('div');
-        c.className = 'confetti';
-        c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-        c.style.left = Math.random() * 100 + 'vw';
-        c.style.top = '-50px';
-        c.style.animationDuration = (Math.random() * 2.5 + 3) + 's';
-        document.body.appendChild(c);
-        setTimeout(() => c.remove(), 6000);
+    lives--;
+    streak=0;
+    wrongCount++;
+    updateHearts();
+    showFeedback('wrong',`❌ خطأ! الإجابة: ${correct}`);
+    playSound('wrong');
+    if(lives<=0){
+      setTimeout(endQuiz,1500);
+      return;
     }
+  }
+
+  setTimeout(()=>{current++;loadQuestion();},1600);
 }
 
+// ============================================================
+// HEARTS
+// ============================================================
+function updateHearts() {
+  for(let i=1;i<=3;i++) {
+    const h=document.getElementById(`h${i}`);
+    if(h) h.classList.toggle('lost', i>lives);
+  }
+}
+
+// ============================================================
+// FEEDBACK
+// ============================================================
+function showFeedback(type, msg) {
+  const toast=document.getElementById('feedback-toast');
+  toast.textContent=msg;
+  toast.className=`feedback-toast ${type==='correct'?'correct-toast':type==='wrong'?'wrong-toast':'timeout-toast'} show`;
+  setTimeout(()=>toast.classList.remove('show'),1800);
+}
+
+function showStreakPopup(n) {
+  const msgs={3:'🔥 سلسلة ثلاثية!',5:'⚡ وحش! x5',10:'👑 أسطورة! x10'};
+  const el=document.createElement('div');
+  el.className='streak-popup';
+  el.textContent=msgs[n]||`🔥 x${n}`;
+  el.style.color=n>=10?'var(--gold)':n>=5?'var(--cyan)':'var(--pink)';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1600);
+}
+
+function showScoreBonus(text) {
+  const el=document.createElement('div');
+  el.className='score-bonus';
+  el.textContent=text;
+  el.style.left=`${30+Math.random()*40}%`;
+  el.style.top=`${20+Math.random()*30}%`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1300);
+}
+
+function showLevelUp(lvl) {
+  const overlay=document.createElement('div');
+  overlay.className='levelup-overlay';
+  overlay.innerHTML=`<div class="levelup-text">🎉 مستوى جديد!<br>${getLevelName(lvl)}</div>`;
+  document.body.appendChild(overlay);
+  playSound('levelup');
+  setTimeout(()=>overlay.remove(),2100);
+}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+function createConfetti(n) {
+  const emojis=['🌟','✨','💎','⚡','🔥','🎉','💫','🚀','👑','🦁'];
+  for(let i=0;i<n;i++){
+    setTimeout(()=>{
+      const c=document.createElement('div');
+      c.className='confetti-piece';
+      c.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+      c.style.cssText=`left:${Math.random()*100}vw;top:-30px;animation-duration:${2+Math.random()*3}s;animation-delay:${Math.random()*0.5}s;font-size:${1+Math.random()*1.5}rem;`;
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(),5000);
+    },i*30);
+  }
+}
+
+// ============================================================
+// END
+// ============================================================
 function endQuiz() {
-    stopTimer();
+  stopTimer();
+  totalTime=Math.round((Date.now()-startTime)/1000);
+  const total=questions.length;
+  const pct=Math.round((correctCount/total)*100);
 
-    const percentage = Math.round((score / (totalQuestions * 15)) * 100);
-    let message = percentage >= 85 ? '👑 أنت أسطورة MONSTER QUIZ!' : 
-                  percentage >= 70 ? '🏆 وحش حقيقي!' : 
-                  percentage >= 50 ? '💪 أداء ممتاز' : '🔄 حاول تاني يا بطل';
+  const grade =
+    pct>=95?{emoji:'👑',text:'LEGEND! أنت وحش حقيقي!',badge:'👑 LEGEND',color:'var(--gold)'} :
+    pct>=85?{emoji:'🏆',text:'ممتاز جداً! أداء أسطوري',badge:'🏆 أسطورة',color:'var(--cyan)'} :
+    pct>=70?{emoji:'🥇',text:'أداء رائع! أحسنت',badge:'🥇 وحش',color:'#c0c0c0'} :
+    pct>=55?{emoji:'💪',text:'جيد! يمكنك أحسن',badge:'💪 جيد',color:'var(--green)'} :
+    pct>=40?{emoji:'📚',text:'حاول تذاكر أكتر',badge:'📚 مقبول',color:'var(--purple)'} :
+    {emoji:'🔄',text:'محتاج مراجعة أكتر يا بطل',badge:'🔄 حاول تاني',color:'var(--red)'};
 
-    document.getElementById('question').innerHTML = `
-        <h2 style="font-size:2.4rem;margin:15px 0;">🎉 انتهت المغامرة!</h2>
-        <p style="font-size:3rem; color:#67e8f9; margin:10px 0;">${score} نقطة</p>
-        <p style="font-size:1.8rem;">${percentage}%</p>
-        <p style="margin:20px 0; font-size:1.4rem;">${message}</p>
-    `;
-    document.getElementById('options').innerHTML = `
-        <button onclick="location.reload()" style="margin:15px 0;">🎮 العب مرة أخرى</button>
-        <button onclick="navigator.share({title:'MONSTER QUIZ', text:'سجلت ${score} نقطة!'}).catch(()=>{})" style="background:#8b5cf6;">📤 شارك النتيجة</button>
-    `;
+  document.getElementById('end-trophy').textContent=grade.emoji;
+  document.getElementById('end-score').textContent=score;
+  document.getElementById('grade-badge').textContent=grade.badge;
+  document.getElementById('grade-badge').style.color=grade.color;
+  document.getElementById('result-msg').textContent=grade.text;
+  document.getElementById('end-correct').textContent=arabicNum(correctCount);
+  document.getElementById('end-wrong').textContent=arabicNum(wrongCount);
+  document.getElementById('end-pct').textContent=arabicNum(pct)+'%';
+  document.getElementById('end-streak').textContent=arabicNum(maxStreak);
+  document.getElementById('end-time').textContent=arabicNum(totalTime);
+  document.getElementById('end-bonus').textContent=arabicNum(bonusTotal);
+
+  // Save to leaderboard
+  addToLeaderboard({
+    name:playerName, score, pct, correct:correctCount,
+    date:new Date().toLocaleDateString('ar-EG'),
+    time:totalTime, streak:maxStreak
+  });
+
+  if(pct>=70) createConfetti(150);
+  show('end-screen');
+}
+
+// ============================================================
+// LEADERBOARD UI
+// ============================================================
+function showLeaderboard() {
+  prevScreen = document.querySelector('.screen:not(.hidden)')?.id;
+  renderLeaderboard();
+  show('lb-screen');
+}
+
+function renderLeaderboard() {
+  const lb=getLeaderboard();
+  const list=document.getElementById('lb-list');
+  if(!lb.length) {
+    list.innerHTML='<li style="text-align:center;padding:30px;color:rgba(255,255,255,0.3)">لا يوجد نتائج بعد</li>';
+    return;
+  }
+  list.innerHTML=lb.map((entry,i)=>`
+    <li class="lb-item">
+      <div class="lb-rank ${i===0?'r1':i===1?'r2':i===2?'r3':'rn'}">${i<3?['🥇','🥈','🥉'][i]:i+1}</div>
+      <div>
+        <div class="lb-name">${entry.name||'بطل مجهول'}</div>
+        <div class="lb-date">${entry.date||''} · ${entry.pct||0}% دقة · سلسلة ${entry.streak||0}</div>
+      </div>
+      <div class="lb-score">${entry.score} نقطة</div>
+    </li>
+  `).join('');
+}
+
+// ============================================================
+// REVIEW
+// ============================================================
+function showReview() {
+  prevScreen='end-screen';
+  const container=document.getElementById('review-list');
+  container.innerHTML=userAnswers.map((r,i)=>`
+    <div class="review-item ${r.ok?'r-correct':'r-wrong'}">
+      <div class="review-q">${arabicNum(i+1)}. ${r.q}</div>
+      <div class="review-ans">
+        إجابتك: <strong style="color:${r.ok?'var(--green)':'var(--red)'}">${r.userAns}</strong>
+        ${!r.ok?` · الصح: <strong style="color:var(--green)">${r.correct}</strong>`:''}
+      </div>
+    </div>
+  `).join('');
+  show('review-screen');
+}
+
+function goBack() {
+  if(prevScreen) show(prevScreen);
+  else show('end-screen');
+}
+
+// ============================================================
+// SHARE
+// ============================================================
+function shareResult() {
+  const total=questions.length;
+  const pct=Math.round((correctCount/total)*100);
+  const text=`🌌 MONSTER QUIZ LEGEND\n👤 ${playerName}\n🏆 ${score} نقطة\n🎯 ${pct}% دقة\n🔥 أطول سلسلة: ${maxStreak}\n✅ ${correctCount}/${total} صح\n\nحل الاختبار وقيّم نفسك! 💪`;
+  if(navigator.share) {
+    navigator.share({title:'MONSTER QUIZ LEGEND',text}).catch(()=>copyText(text));
+  } else {
+    copyText(text);
+  }
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(()=>alert('تم نسخ النتيجة! شاركها مع أصحابك 🔥')).catch(()=>{});
+}
+
+// ============================================================
+// MUSIC
+// ============================================================
+function tryPlayMusic() {
+  const m=document.getElementById('bgMusic');
+  m.volume=0.2;
+  m.play().then(()=>{
+    musicOn=true;
+    document.getElementById('music-btn').classList.add('active');
+  }).catch(()=>{
+    musicOn=false;
+  });
 }
 
 function toggleMusic() {
-    const music = document.getElementById('bgMusic');
-    music.paused ? music.play() : music.pause();
+  const m=document.getElementById('bgMusic');
+  const btn=document.getElementById('music-btn');
+  if(musicOn){m.pause();musicOn=false;btn.classList.remove('active');}
+  else{m.play();musicOn=true;btn.classList.add('active');}
 }
 
+function playSound(type) {
+  const ids={correct:'sndCorrect',wrong:'sndWrong',levelup:'sndLevelUp',streak:'sndStreak'};
+  const el=document.getElementById(ids[type]);
+  if(!el) return;
+  el.currentTime=0;
+  el.volume=0.5;
+  el.play().catch(()=>{});
+}
+
+// ============================================================
+// FULLSCREEN
+// ============================================================
 function toggleFullscreen() {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-    else document.exitFullscreen();
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
 }
 
-// بداية اللعبة
-console.log('%c🌌 MONSTER QUIZ LEGEND - النسخة الأسطورية 2026 🔥', 'color:#67e8f9;font-size:22px;font-weight:900;');
+// ============================================================
+// KEYBOARD
+// ============================================================
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter') {
+    const passScreen=document.getElementById('pass-screen');
+    if(!passScreen.classList.contains('hidden')) checkPassword();
+  }
+  if(e.key==='1'||e.key==='ArrowRight') {
+    const opts=document.querySelectorAll('.option:not(.disabled)');
+    if(opts[0]) opts[0].click();
+  }
+  if(e.key==='2'||e.key==='ArrowLeft') {
+    const opts=document.querySelectorAll('.option:not(.disabled)');
+    if(opts[1]) opts[1].click();
+  }
+});
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('load',()=>{
+  initCanvas();
+  initParticles();
+  setTimeout(()=>{
+    document.getElementById('loading-screen').classList.add('hidden');
+    show('pass-screen');
+    document.getElementById('pass-input').focus();
+  },1200);
+});
 </script>
 </body>
 </html>
